@@ -26,11 +26,6 @@ function animate(timeStamp) {
     ball.velocity.add(ball.acceleration);
     ball.velocity.scale(FRICTION);
 
-    if (ball.velocity.approx_equals(Vector2.ZERO)) {
-        ball.velocity.set(0, 0);
-    }
-
-    // ball.velocity.move_toward(Vector2.ZERO, delta * delta);
     ball.velocity.clamp(new Vector2(-MAX_VELOCITY), new Vector2(MAX_VELOCITY));
 
     let velocity = ball.velocity.getDirection();
