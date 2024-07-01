@@ -27,6 +27,11 @@ export class Vector2 {
         this.y = y;
     }
 
+    add(other) {
+        this.x += other.x;
+        this.y += other.y;
+    }
+
     scale(scalar) {
         this.x *= scalar;
         this.y *= scalar;

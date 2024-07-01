@@ -22,19 +22,18 @@ function animate(timeStamp) {
         (ball.radius + 1) * 2, (ball.radius + 1) * 2);
 
     const delta = (timeStamp - previousTimeStamp) / 1000.0;
-    
-    ball.velocity.lerp(Vector2.ZERO, FRICTION);
 
-    ball.velocity.x += ball.acceleration.x * MAX_ACCELARATION * delta;
-    ball.velocity.y += ball.acceleration.y * MAX_ACCELARATION * delta;
+    ball.velocity.add(ball.acceleration);
+    ball.velocity.scale(MAX_ACCELARATION * delta);
+
+    ball.velocity.lerp(Vector2.ZERO, FRICTION);
 
     ball.velocity.clamp(new Vector2(-MAX_VELOCITY), new Vector2(MAX_VELOCITY));
 
     let velocity = ball.velocity.getDirection();
+    velocity.scale(MAX_VELOCITY * delta);
     
-    ball.position.x += MAX_VELOCITY * velocity.x * delta;
-    ball.position.y += MAX_VELOCITY * velocity.y * delta;
-
+    ball.position.add(velocity);
     ball.position.clamp(Vector2.ZERO, new Vector2(500));
     
     ctx.beginPath();
