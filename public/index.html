@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multiplayer Game</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const socket = io();
+
+            document.getElementById('joinButton').addEventListener('click', () => {
+                const name = document.getElementById('nameInput').value;
+                if (name) {
+                    socket.emit('setName', { name: name });
+                }
+            });
+
+            socket.on('gameStart', (data) => {
+                console.log(`Game ${data.gameId} started. You are player ${data.playerId} (Name: ${data.name})`);
+            });
+
+            socket.on('playerLeft', (data) => {
+                console.log(`Player ${data.playerId} left the game`);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Multiplayer Game</h1>
+    <input type="text" id="nameInput" placeholder="Enter your name">
+    <button id="joinButton">Join Game</button>
+    <p>Open this page in multiple tabs to simulate multiple players connecting.</p>
+</body>
+</html>
