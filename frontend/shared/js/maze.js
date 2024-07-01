@@ -31,6 +31,8 @@ function clamp(value, min, max) {
     return (value < -min) ? min : (value > max) ? max : value;
 }
 
+let stats = document.getElementById("stats");
+
 function animate(timeStamp) {
     let canvas = document.getElementById("maze");
     let ctx = canvas.getContext("2d");
@@ -58,7 +60,10 @@ function animate(timeStamp) {
     ctx.beginPath();
     ctx.arc(ball.x, ball.y, 10, 0, 2 * Math.PI);
     ctx.stroke();
-    
+
+    // stats.innerText = "hello";
+    stats.innerText = `x: ${ball.x}, y: ${ball.y}`; 
+
     window.requestAnimationFrame(animate);
 }
 
@@ -72,9 +77,7 @@ window.addEventListener("deviceorientation", (event) => {
     ball.ax = z;
     ball.ay = y;
 
-    let stats = document.getElementById("stats");
-    // stats.innerText = "hello";
-    stats.innerText = `a: ${x}, b: ${y}, g: ${z}`; 
+    
 }, true);
 
 
