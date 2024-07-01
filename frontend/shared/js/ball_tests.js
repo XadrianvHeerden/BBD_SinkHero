@@ -22,9 +22,8 @@ function animate(timeStamp) {
         (ball.radius + 1) * 2, (ball.radius + 1) * 2);
 
     const delta = (timeStamp - previousTimeStamp) / 1000.0;
-
+    ball.acceleration.scale(MAX_ACCELARATION * delta);
     ball.velocity.add(ball.acceleration);
-    ball.velocity.scale(MAX_ACCELARATION * delta);
 
     ball.velocity.lerp(Vector2.ZERO, FRICTION);
 
