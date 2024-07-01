@@ -34,6 +34,11 @@ function animate(timeStamp) {
     
     ball.x += ball.v * Math.cos(ball.d * (Math.PI / 180)) * speed;
     ball.y += ball.v * Math.sin(ball.d * (Math.PI / 180)) * speed;
+
+    ball.x = (ball.x < 0) ? 0 : ball.x;
+    ball.x = (ball.x > 500) ? 500: ball.x;
+    ball.y = (ball.y < 0) ? 0 : ball.y;
+    ball.y = (ball.y > 500) ? 500: ball.y;
     
     console.log(`x: ${ball.x}, timePassed: ${timePassed}`);
     
