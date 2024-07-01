@@ -2,7 +2,7 @@ import { Vector2 } from "./physics.js";
 import { clamp, round } from "./utils.js";
 
 const MAX_VELOCITY = 300;
-const MAX_ACCELARATION = 50;
+const MAX_ACCELARATION = 5;
 
 let ball = { radius: 10, position: new Vector2(), velocity: new Vector2(), acceleration: new Vector2() }
 let previousTimeStamp = 0;
