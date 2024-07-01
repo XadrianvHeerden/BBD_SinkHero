@@ -4,8 +4,10 @@ import { clamp, round } from "./utils.js";
 const MAX_VELOCITY = 300;
 const MAX_ACCELARATION = 1000;
 
-let ball = { position: new Vector2(), velocity: new Vector2(), acceleration: new Vector2() }
+let ball = { radius: 10, position: new Vector2(), velocity: new Vector2(), acceleration: new Vector2() }
 let previousTimeStamp = 0;
+
+const FRICTION = 0.96;
 
 // for debugging
 let stats = document.getElementById("stats");
@@ -14,28 +16,26 @@ function animate(timeStamp) {
     let canvas = document.getElementById("maze");
     let ctx = canvas.getContext("2d");
 
-    ctx.clearRect(ball.position.x - 12, ball.position.y - 12, 24, 24);
+    ctx.clearRect(ball.position.x - ball.radius - 1, ball.position.y - ball.radius - 1, (ball.radius + 1) * 2, (ball.radius + 1) * 2);
 
     const delta = (timeStamp - previousTimeStamp) / 1000.0;
     
+    ball.velocity.scale(FRICTION);
+
     ball.velocity.x += ball.acceleration.x * MAX_ACCELARATION * delta;
     ball.velocity.y += ball.acceleration.y * MAX_ACCELARATION * delta;
 
-    ball.velocity.x = clamp(ball.velocity.x, -MAX_VELOCITY, MAX_VELOCITY);
-    ball.velocity.y = clamp(ball.velocity.y, -MAX_VELOCITY, MAX_VELOCITY);
+    ball.velocity.clamp(new Vector2(-MAX_VELOCITY), new Vector2(MAX_VELOCITY));
+
+    let velocity = ball.velocity.getDirection();
     
-    let magnitude = Math.sqrt(ball.velocity.x * ball.velocity.x + ball.velocity.y * ball.velocity.y);
+    ball.position.x += MAX_VELOCITY * velocity.x * delta;
+    ball.position.y += MAX_VELOCITY * velocity.y * delta;
 
-    if (magnitude !== 0) {
-        ball.position.x += MAX_VELOCITY * (ball.velocity.x / magnitude) * delta;
-        ball.position.y += MAX_VELOCITY * (ball.velocity.y / magnitude) * delta;
-    }
-
-    ball.position.x = clamp(ball.position.x, 0, 500);
-    ball.position.y = clamp(ball.position.y, 0, 500);
+    ball.position.clamp(new Vector2(), new Vector2(500));
     
     ctx.beginPath();
-    ctx.arc(ball.position.x, ball.position.y, 10, 0, 2 * Math.PI);
+    ctx.arc(ball.position.x, ball.position.y, ball.radius, 0, 2 * Math.PI);
     ctx.stroke();
 
     stats.innerText = `x: ${ball.position.x}, y: ${ball.position.y}, acceleration.x: ${ball.acceleration.x}, acceleration.y: ${ball.acceleration.y}, velocity.x: ${ball.velocity.x}, velocity.y: ${ball.velocity.y}`; 
