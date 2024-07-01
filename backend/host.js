@@ -96,8 +96,9 @@ io.on('connection', (socket) => {
         socket.name = data.name;
         players.push(socket);
 
-        // Check if we have enough players to start a game
+        // Automatically start the game if 4 players join
         if (players.length === 4) {
+<<<<<<< HEAD
             let game = players.splice(0, 4);
             let gameId = games.length;
             games.push(game);
@@ -113,9 +114,20 @@ io.on('connection', (socket) => {
 >>>>>>> df5a9d6 (added host)
 =======
             console.log(`Game ${gameId} started with players:`, game.map(p => p.id + " (" + p.name + ")"));
+=======
+            startGame();
+        } else {
+            // Notify the player that they are waiting for more players
+            socket.emit('waiting', { playersCount: players.length });
+>>>>>>> db92fa2 (added ability for 2 to 4 people to play)
         }
     });
 >>>>>>> 2ef70e2 (Basic backend to connect to server)
+
+    // Handle starting the game manually
+    socket.on('startGame', () => {
+        startGame();
+    });
 
     socket.on('disconnect', () => {
         console.log('A player disconnected:', socket.id);
@@ -244,6 +256,21 @@ io.on('connection', (socket) => {
         });
 >>>>>>> df5a9d6 (added host)
     });
+
+    const startGame = () => {
+        if (players.length >= 2) {
+            let gamePlayers = players.splice(0, players.length);
+            let gameId = games.length;
+            games.push(gamePlayers);
+
+            // Notify players they are in a game
+            gamePlayers.forEach((player, index) => {
+                player.emit('gameStart', { gameId: gameId, playerId: index, name: player.name });
+            });
+
+            console.log(`Game ${gameId} started with players:`, gamePlayers.map(p => p.id + " (" + p.name + ")"));
+        }
+    };
 });
 
 server.listen(3000, () => {
