@@ -2,9 +2,13 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 <<<<<<< HEAD
+<<<<<<< HEAD
 const path = require('path');
 =======
 >>>>>>> df5a9d6 (added host)
+=======
+const path = require('path');
+>>>>>>> 2ef70e2 (Basic backend to connect to server)
 
 const app = express();
 const server = http.createServer(app);
@@ -82,26 +86,36 @@ io.on('connection', (socket) => {
 let players = [];
 let games = [];
 
+app.use(express.static(path.join(__dirname, './../public')));
+
 io.on('connection', (socket) => {
     console.log('A player connected:', socket.id);
 
-    // Add player to the players array
-    players.push(socket);
+    // Handle setting the player's name
+    socket.on('setName', (data) => {
+        socket.name = data.name;
+        players.push(socket);
 
-    // Check if we have enough players to start a game
-    if (players.length === 4) {
-        let game = players.splice(0, 4);
-        let gameId = games.length;
-        games.push(game);
+        // Check if we have enough players to start a game
+        if (players.length === 4) {
+            let game = players.splice(0, 4);
+            let gameId = games.length;
+            games.push(game);
 
-        // Notify players they are in a game
-        game.forEach((player, index) => {
-            player.emit('gameStart', { gameId: gameId, playerId: index });
-        });
+            // Notify players they are in a game
+            game.forEach((player, index) => {
+                player.emit('gameStart', { gameId: gameId, playerId: index, name: player.name });
+            });
 
+<<<<<<< HEAD
         console.log(`Game ${gameId} started with players:`, game.map(p => p.id));
     }
 >>>>>>> df5a9d6 (added host)
+=======
+            console.log(`Game ${gameId} started with players:`, game.map(p => p.id + " (" + p.name + ")"));
+        }
+    });
+>>>>>>> 2ef70e2 (Basic backend to connect to server)
 
     socket.on('disconnect', () => {
         console.log('A player disconnected:', socket.id);
@@ -235,7 +249,11 @@ io.on('connection', (socket) => {
 server.listen(3000, () => {
     console.log('Server is listening on port 3000');
 <<<<<<< HEAD
+<<<<<<< HEAD
 });
 =======
 });
 >>>>>>> df5a9d6 (added host)
+=======
+});
+>>>>>>> 2ef70e2 (Basic backend to connect to server)

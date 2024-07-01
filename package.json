@@ -4,8 +4,12 @@
   "description": "Game to play",
   "main": "index.js",
   "scripts": {
+<<<<<<< HEAD
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./backend/host.js"
+=======
+    "test": "echo \"Error: no test specified\" && exit 1"
+>>>>>>> 2ef70e2 (Basic backend to connect to server)
   },
   "keywords": [],
   "author": "",
