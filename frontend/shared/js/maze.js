@@ -57,8 +57,8 @@ window.addEventListener("deviceorientation", (event) => {
     const y = event.beta / 180;
     const z = event.gamma / 90;
     
-    ball.vx = y;
-    ball.vy = z;
+    ball.vx = z;
+    ball.vy = y;
 
     let stats = document.getElementById("stats");
     // stats.innerText = "hello";
