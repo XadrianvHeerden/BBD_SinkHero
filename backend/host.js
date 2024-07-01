@@ -1,12 +1,16 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+<<<<<<< HEAD
 const path = require('path');
+=======
+>>>>>>> df5a9d6 (added host)
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+<<<<<<< HEAD
 let hosts = [];
 let players = [];
 let games = [];
@@ -74,10 +78,35 @@ io.on('connection', (socket) => {
     socket.on('startGame', () => {
         startGame(socket.gameId);
     });
+=======
+let players = [];
+let games = [];
+
+io.on('connection', (socket) => {
+    console.log('A player connected:', socket.id);
+
+    // Add player to the players array
+    players.push(socket);
+
+    // Check if we have enough players to start a game
+    if (players.length === 4) {
+        let game = players.splice(0, 4);
+        let gameId = games.length;
+        games.push(game);
+
+        // Notify players they are in a game
+        game.forEach((player, index) => {
+            player.emit('gameStart', { gameId: gameId, playerId: index });
+        });
+
+        console.log(`Game ${gameId} started with players:`, game.map(p => p.id));
+    }
+>>>>>>> df5a9d6 (added host)
 
     socket.on('disconnect', () => {
         console.log('A player disconnected:', socket.id);
 
+<<<<<<< HEAD
         const gameId = socket.gameId;
         if (!gameId) return;
 
@@ -186,9 +215,27 @@ io.on('connection', (socket) => {
         hosts.forEach(host => {
             host.emit("playerPositionChangedHost", data);
         })
+=======
+        // Remove player from the players array
+        players = players.filter(player => player.id !== socket.id);
+
+        // Remove player from any game they were in
+        games.forEach(game => {
+            let index = game.indexOf(socket);
+            if (index !== -1) {
+                game.splice(index, 1);
+                // Notify other players in the game
+                game.forEach(player => player.emit('playerLeft', { playerId: index }));
+            }
+        });
+>>>>>>> df5a9d6 (added host)
     });
 });
 
 server.listen(3000, () => {
     console.log('Server is listening on port 3000');
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> df5a9d6 (added host)
