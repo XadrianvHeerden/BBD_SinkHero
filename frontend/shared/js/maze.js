@@ -27,26 +27,26 @@ function draw_maze(maze) {
 // let oldTimeStamp = 0;
 // const animationSpeed = 5; // Adjust as needed
 
-// function animate(timeStamp) {
-//     const timePassed = (timeStamp - oldTimeStamp) / 1000.0;
-//     oldTimeStamp = timeStamp;
-//     const speed = timePassed / animationSpeed;
+function animate(timeStamp) {
+    const timePassed = (timeStamp - oldTimeStamp) / 1000.0;
+    oldTimeStamp = timeStamp;
+    const speed = timePassed / animationSpeed;
     
-//     ball.x += ball.v * Math.cos(ball.d * (Math.PI / 180)) * speed;
-//     ball.y += ball.v * Math.sin(ball.d * (Math.PI / 180)) * speed;
+    ball.x += ball.v * Math.cos(ball.d * (Math.PI / 180)) * speed;
+    ball.y += ball.v * Math.sin(ball.d * (Math.PI / 180)) * speed;
     
-//     console.log(`x: ${ball.x}, timePassed: ${timePassed}`);
+    console.log(`x: ${ball.x}, timePassed: ${timePassed}`);
     
-//     let canvas = document.getElementById("maze");
-//     let ctx = canvas.getContext("2d");
+    let canvas = document.getElementById("maze");
+    let ctx = canvas.getContext("2d");
     
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-//     ctx.beginPath();
-//     ctx.arc(ball.x, ball.y, 10, 0, 2 * Math.PI);
-//     ctx.stroke();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, 10, 0, 2 * Math.PI);
+    ctx.stroke();
     
-//     window.requestAnimationFrame(animate);
-// }
+    window.requestAnimationFrame(animate);
+}
 
 // let stats = document.getElementById("stats");
 // stats.innerText = "hi";
@@ -68,6 +68,6 @@ window.addEventListener("deviceorientation", (event) => {
     stats.innerText = `a: ${x}, b: ${y}, g: ${z}`; 
 }, true);
 
-// window.requestAnimationFrame(animate);
+window.requestAnimationFrame(animate);
 
 draw_maze(MAZE);
