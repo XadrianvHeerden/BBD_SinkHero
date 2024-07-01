@@ -10,7 +10,7 @@ const MAZE = [
 const ROWS = MAZE.length, COLUMNS = MAZE[0].length;
 const TILE_SIZE = 64;
 
-let ball = { x: 0, y: 0, vx: 1, vy: 1, v: 300, ax: 1, ay: 1, a: 100 }
+let ball = { x: 0, y: 0, vx: 1, vy: 1, v: 300, ax: 1, ay: 1, a: 1000 }
 
 function draw_maze(maze) {
     let canvas = document.getElementById("maze");
