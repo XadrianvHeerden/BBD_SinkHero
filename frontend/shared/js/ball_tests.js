@@ -26,12 +26,12 @@ function animate(timeStamp) {
     ball.velocity.add(ball.acceleration);
     ball.velocity.scale(MAX_ACCELARATION * delta);
 
-    ball.velocity.lerp(Vector2.ZERO, FRICTION);
+    ball.velocity.lerp(Vector2.ZERO, delta);
 
     ball.velocity.clamp(new Vector2(-MAX_VELOCITY), new Vector2(MAX_VELOCITY));
 
     let velocity = ball.velocity.getDirection();
-    velocity.scale(MAX_VELOCITY * delta);
+    velocity.scale(MAX_VELOCITY);
     
     ball.position.add(velocity);
     ball.position.clamp(Vector2.ZERO, new Vector2(500));
