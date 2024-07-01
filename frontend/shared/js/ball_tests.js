@@ -7,7 +7,7 @@ const MAX_ACCELARATION = 1000;
 let ball = { radius: 10, position: new Vector2(), velocity: new Vector2(), acceleration: new Vector2() }
 let previousTimeStamp = 0;
 
-const FRICTION = 0.96;
+const FRICTION = 0.8;
 
 // for debugging
 let stats = document.getElementById("stats");
