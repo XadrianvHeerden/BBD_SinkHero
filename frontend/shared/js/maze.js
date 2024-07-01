@@ -10,7 +10,7 @@ const MAZE = [
 const ROWS = MAZE.length, COLUMNS = MAZE[0].length;
 const TILE_SIZE = 64;
 
-let ball = { x: 0, y: 0, vx: 1, vy: 1, v: 200 }
+let ball = { x: 0, y: 0, vx: 1, vy: 1, v: 300, ax: 1, ay: 1, a: 10 }
 
 function draw_maze(maze) {
     let canvas = document.getElementById("maze");
@@ -27,21 +27,32 @@ function draw_maze(maze) {
 let oldTimeStamp = 0;
 const animationSpeed = 1; // Adjust as needed
 
+function clamp(value, min, max) {
+    return (value < -min) ? min : (value > max) ? max : value;
+}
+
 function animate(timeStamp) {
+    let canvas = document.getElementById("maze");
+    let ctx = canvas.getContext("2d");
+
     const timePassed = (timeStamp - oldTimeStamp) / 1000.0;
     oldTimeStamp = timeStamp;
     const speed = timePassed / animationSpeed;
+    const MAX_VEL = 300;
     
-    ball.x += ball.v * ball.vx * speed;
-    ball.y += ball.v * ball.vy * speed;
+    ball.vx += ball.ax * ball.a * speed;
+    ball.vy += ball.ay * ball.a * speed;
 
-    ball.x = (ball.x < 0) ? 0 : ball.x;
-    ball.x = (ball.x > 500) ? 500: ball.x;
-    ball.y = (ball.y < 0) ? 0 : ball.y;
-    ball.y = (ball.y > 500) ? 500: ball.y;
+    ball.vx = clamp(ball.vx, -MAX_VEL, MAX_VEL);
+    ball.vy = clamp(ball.vy, -MAX_VEL, MAX_VEL);
     
-    let canvas = document.getElementById("maze");
-    let ctx = canvas.getContext("2d");
+    vm = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
+
+    ball.x += (ball.vx/vm) * speed;
+    ball.y += (ball.vy/vm) * speed;
+
+    ball.x = clamp(ball.x, 0, 500);
+    ball.y = clamp(ball.y, 0, 500);
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.beginPath();
@@ -50,6 +61,7 @@ function animate(timeStamp) {
     
     window.requestAnimationFrame(animate);
 }
+
 window.requestAnimationFrame(animate);
 
 window.addEventListener("deviceorientation", (event) => {
@@ -57,8 +69,8 @@ window.addEventListener("deviceorientation", (event) => {
     const y = event.beta / 180;
     const z = event.gamma / 90;
     
-    ball.vx = z;
-    ball.vy = y;
+    ball.ax = z;
+    ball.ay = y;
 
     let stats = document.getElementById("stats");
     // stats.innerText = "hello";
