@@ -26,7 +26,7 @@ function animate(timeStamp) {
     ball.velocity.add(ball.acceleration);
     ball.velocity.scale(MAX_ACCELARATION * delta);
 
-    ball.velocity.lerp(Vector2.ZERO, delta);
+    ball.velocity.lerp(Vector2.ZERO, FRICTION);
 
     ball.velocity.clamp(new Vector2(-MAX_VELOCITY), new Vector2(MAX_VELOCITY));
 
@@ -48,7 +48,6 @@ function animate(timeStamp) {
 
 window.requestAnimationFrame(animate);
 window.addEventListener("deviceorientation", (event) => {
-    const x = round(event.alpha / 360, 2);
     const y = round(event.beta / 180, 2);
     const z = round(event.gamma / 90, 2);
     

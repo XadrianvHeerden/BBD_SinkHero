@@ -54,7 +54,7 @@ export class Vector2 {
     getDirection() {
         let magnitude = this.getMagnitude();
         
-        if (!magnitude)
+        if (magnitude == 0)
             return this;
 
         return new Vector2(this.x / magnitude, this.y / magnitude);        
