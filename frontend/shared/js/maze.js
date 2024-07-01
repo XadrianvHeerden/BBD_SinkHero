@@ -24,8 +24,8 @@ function draw_maze(maze) {
     }
 }
 
-// let oldTimeStamp = 0;
-// const animationSpeed = 5; // Adjust as needed
+let oldTimeStamp = 0;
+const animationSpeed = 1; // Adjust as needed
 
 function animate(timeStamp) {
     const timePassed = (timeStamp - oldTimeStamp) / 1000.0;
@@ -47,14 +47,7 @@ function animate(timeStamp) {
     
     window.requestAnimationFrame(animate);
 }
-
-// let stats = document.getElementById("stats");
-// stats.innerText = "hi";
-
-
-let stats = document.getElementById("stats");
-    // stats.innerText = "hello";
-stats.innerText = `a: ${window.DeviceOrientationEvent}`; 
+window.requestAnimationFrame(animate);
 
 window.addEventListener("deviceorientation", (event) => {
     const x = event.alpha;
@@ -68,6 +61,5 @@ window.addEventListener("deviceorientation", (event) => {
     stats.innerText = `a: ${x}, b: ${y}, g: ${z}`; 
 }, true);
 
-window.requestAnimationFrame(animate);
 
 draw_maze(MAZE);
