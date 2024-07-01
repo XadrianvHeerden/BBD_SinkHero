@@ -141,6 +141,7 @@ io.on('connection', (socket) => {
         console.log('A player disconnected:', socket.id);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         const gameId = socket.gameId;
         if (!gameId) return;
 
@@ -251,15 +252,22 @@ io.on('connection', (socket) => {
         })
 =======
         // Remove player from the players array
+=======
+>>>>>>> 5d4b510 (End when insufficient players connected)
         players = players.filter(player => player.id !== socket.id);
 
-        // Remove player from any game they were in
-        games.forEach(game => {
+        games.forEach((game, gameId) => {
             let index = game.indexOf(socket);
             if (index !== -1) {
                 game.splice(index, 1);
-                // Notify other players in the game
                 game.forEach(player => player.emit('playerLeft', { playerId: index }));
+
+                // If only one or no players are left, remove the game
+                if (game.length <= 1) {
+                    game.forEach(player => player.emit('gameEnded', { gameId: gameId }));
+                    games.splice(gameId, 1);
+                    console.log(`Game ${gameId} ended due to insufficient players.`);
+                }
             }
         });
 >>>>>>> df5a9d6 (added host)

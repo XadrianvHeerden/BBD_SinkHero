@@ -131,6 +131,7 @@
                 const name = document.getElementById('nameInput').value;
                 if (name) {
                     socket.emit('setName', { name: name });
+                    document.getElementById('gameInfo').innerHTML = ` `;
                 }
             });
 
@@ -139,6 +140,7 @@
             });
 
             socket.on('waiting', (data) => {
+                document.getElementById('waitingMessage').style.display = '';
                 document.getElementById('waitingMessage').innerText = `Waiting for more players... (${data.playersCount}/4)`;
                 if(data.playersCount >= 2){
                     document.getElementById('startSection').style.display = '';
@@ -264,6 +266,16 @@
                         gamesList.appendChild(gameItem);
                     });
                 });
+            });
+
+            socket.on('gameEnded', (data) => {
+                console.log(`Game ${data.gameId} ended due to insufficient players.`);
+                document.getElementById('gameInfo').innerHTML = `
+                    <h2>Game Ended</h2>
+                    <p>Game ID: ${data.gameId} ended due to insufficient players.</p>
+                `;
+                document.getElementById('joinSection').style.display = 'block';
+                document.getElementById('startSection').style.display = 'none';
             });
         });
 
