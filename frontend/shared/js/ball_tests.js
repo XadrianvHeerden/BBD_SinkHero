@@ -23,7 +23,7 @@ function animate(timeStamp) {
 
     const delta = (timeStamp - previousTimeStamp) / 1000.0;
     
-    ball.velocity.scale(FRICTION);
+    // ball.velocity.scale(FRICTION);
 
     ball.velocity.x += ball.acceleration.x * MAX_ACCELARATION * delta;
     ball.velocity.y += ball.acceleration.y * MAX_ACCELARATION * delta;
