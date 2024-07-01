@@ -23,7 +23,7 @@ function animate(timeStamp) {
 
     const delta = (timeStamp - previousTimeStamp) / 1000.0;
     
-    // ball.velocity.scale(FRICTION);
+    ball.velocity.lerp(Vector2.ZERO, FRICTION);
 
     ball.velocity.x += ball.acceleration.x * MAX_ACCELARATION * delta;
     ball.velocity.y += ball.acceleration.y * MAX_ACCELARATION * delta;
@@ -35,7 +35,7 @@ function animate(timeStamp) {
     ball.position.x += MAX_VELOCITY * velocity.x * delta;
     ball.position.y += MAX_VELOCITY * velocity.y * delta;
 
-    ball.position.clamp(new Vector2(), new Vector2(500));
+    ball.position.clamp(Vector2.ZERO, new Vector2(500));
     
     ctx.beginPath();
     ctx.arc(ball.position.x, ball.position.y, ball.radius, 0, 2 * Math.PI);

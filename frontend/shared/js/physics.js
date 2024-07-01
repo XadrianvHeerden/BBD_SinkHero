@@ -1,4 +1,4 @@
-import { clamp } from "./utils.js";
+import { clamp, lerp } from "./utils.js";
 
 export class BoundingBox {
     constructor(x, y, width, height) {
@@ -10,6 +10,7 @@ export class BoundingBox {
 }
 
 export class Vector2 {
+    static ZERO = new Vector2()
     static UP = new Vector2(0, -1)
     static DOWN = new Vector2(0, 1)
     static RIGHT = new Vector2(1, 0)
@@ -34,6 +35,11 @@ export class Vector2 {
     clamp(min, max) {
         this.x = clamp(this.x, min.x, max.x);
         this.y = clamp(this.y, min.y, max.y);
+    }
+
+    lerp(end, factor) {
+        this.x = lerp(this.x, end.x, factor);
+        this.y = lerp(this.y, end.y, factor);
     }
 
     getMagnitude() {
