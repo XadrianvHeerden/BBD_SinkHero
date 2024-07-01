@@ -10,7 +10,7 @@ const MAZE = [
 const ROWS = MAZE.length, COLUMNS = MAZE[0].length;
 const TILE_SIZE = 64;
 
-let ball = { x: 0, y: 0, vx: 1, vy: 1, v: 300, ax: 1, ay: 1, a: 10 }
+let ball = { x: 0, y: 0, vx: 1, vy: 1, v: 300, ax: 1, ay: 1, a: 100 }
 
 function draw_maze(maze) {
     let canvas = document.getElementById("maze");
@@ -28,7 +28,7 @@ let oldTimeStamp = 0;
 const animationSpeed = 1; // Adjust as needed
 
 function clamp(value, min, max) {
-    return (value < -min) ? min : (value > max) ? max : value;
+    return Math.min(Math.max(value, min), max);
 }
 
 let stats = document.getElementById("stats");
@@ -50,8 +50,8 @@ function animate(timeStamp) {
     
     vm = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy);
 
-    ball.x += (ball.vx/vm) * speed;
-    ball.y += (ball.vy/vm) * speed;
+    ball.x += MAX_VEL * (ball.vx/vm) * speed;
+    ball.y += MAX_VEL * (ball.vy/vm) * speed;
 
     ball.x = clamp(ball.x, 0, 500);
     ball.y = clamp(ball.y, 0, 500);
@@ -62,17 +62,21 @@ function animate(timeStamp) {
     ctx.stroke();
 
     // stats.innerText = "hello";
-    // stats.innerText = `x: ${ball.x}, y: ${ball.y}, ax: ${ball.ax}, ay: ${ball.ay}, vx: ${ball.vx}, vy: ${ball.vy}`; 
+    stats.innerText = `x: ${ball.x}, y: ${ball.y}, ax: ${ball.ax}, ay: ${ball.ay}, vx: ${ball.vx}, vy: ${ball.vy}`; 
 
     window.requestAnimationFrame(animate);
 }
 
 window.requestAnimationFrame(animate);
 
+function round(value, precision = 2) {
+    return Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision);
+}
+
 window.addEventListener("deviceorientation", (event) => {
-    const x = event.alpha / 360;
-    const y = event.beta / 180;
-    const z = event.gamma / 90;
+    const x = round(event.alpha / 360, 2);
+    const y = round(event.beta / 180, 2);
+    const z = round(event.gamma / 90, 2);
     
     ball.ax = z;
     ball.ay = y;
