@@ -40,7 +40,7 @@ function animate(timeStamp) {
     const timePassed = (timeStamp - oldTimeStamp) / 1000.0;
     oldTimeStamp = timeStamp;
     const speed = timePassed / animationSpeed;
-    const MAX_VEL = 300;
+    const MAX_VEL = 30;
     
     ball.vx += ball.ax * ball.a * speed;
     ball.vy += ball.ay * ball.a * speed;
