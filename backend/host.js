@@ -12,6 +12,14 @@ let games = [];
 
 app.use(express.static(path.join(__dirname, './../public')));
 
+app.get('/games', (req, res) => {
+    const gameList = games.map((game, gameId) => ({
+        gameId,
+        players: game.map(player => player.name)
+    }));
+    res.json(gameList);
+});
+
 io.on('connection', (socket) => {
     console.log('A player connected:', socket.id);
 

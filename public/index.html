@@ -41,7 +41,26 @@
             socket.on('playerLeft', (data) => {
                 console.log(`Player ${data.playerId} left the game`);
             });
+
+            document.getElementById('listGamesButton').addEventListener('click', () => {
+            fetch('/games')
+                .then(response => response.json())
+                .then(data => {
+                    const gamesList = document.getElementById('gamesList');
+                    gamesList.innerHTML = '';
+                    data.forEach(game => {
+                        const gameItem = document.createElement('div');
+                        gameItem.innerHTML = `
+                            <h3>Game ${game.gameId}</h3>
+                            <p>Players: ${game.players.join(', ')}</p>
+                        `;
+                        gamesList.appendChild(gameItem);
+                    });
+                });
+            });
         });
+
+        
     </script>
 </head>
 <body>
@@ -56,5 +75,9 @@
     </div>
     <div id="gameInfo"></div>
     <p>Open this page in multiple tabs to simulate multiple players connecting.</p>
+    <div id="hostSection">
+        <button id="listGamesButton">List Games</button>
+        <div id="gamesList"></div>
+    </div>
 </body>
 </html>
