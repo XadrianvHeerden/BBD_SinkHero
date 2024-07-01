@@ -62,7 +62,7 @@ function animate(timeStamp) {
     ctx.stroke();
 
     // stats.innerText = "hello";
-    stats.innerText = `x: ${ball.x}, y: ${ball.y}, ax: ${ball.ax}, ay: ${ball.ay}, vx: ${ball.vx}, vy: ${ball.vy}`; 
+    // stats.innerText = `x: ${ball.x}, y: ${ball.y}, ax: ${ball.ax}, ay: ${ball.ay}, vx: ${ball.vx}, vy: ${ball.vy}`; 
 
     window.requestAnimationFrame(animate);
 }
@@ -76,6 +76,7 @@ window.addEventListener("deviceorientation", (event) => {
     
     ball.ax = z;
     ball.ay = y;
+    stats.innerText = `ax: ${z}, ay: ${y}`
 }, true);
 
 
