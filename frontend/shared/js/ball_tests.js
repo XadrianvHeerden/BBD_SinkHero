@@ -2,7 +2,7 @@ import { Vector2 } from "./physics.js";
 import { clamp, round } from "./utils.js";
 
 const MAX_VELOCITY = 300;
-const MAX_ACCELARATION = 5;
+const MAX_ACCELARATION = 1;
 
 let ball = { radius: 10, position: new Vector2(), velocity: new Vector2(), acceleration: new Vector2() }
 let previousTimeStamp = 0;
@@ -24,9 +24,13 @@ function animate(timeStamp) {
     const delta = (timeStamp - previousTimeStamp) / 1000.0;
     ball.acceleration.scale(MAX_ACCELARATION * delta);
     ball.velocity.add(ball.acceleration);
+    ball.velocity.lerp(Vector2.ZERO, delta * delta);
 
-    ball.velocity.lerp(Vector2.ZERO, FRICTION);
+    if (ball.velocity.approx_equals(Vector2.ZERO)) {
+        ball.velocity.set(0, 0);
+    }
 
+    // ball.velocity.move_toward(Vector2.ZERO, delta * delta);
     ball.velocity.clamp(new Vector2(-MAX_VELOCITY), new Vector2(MAX_VELOCITY));
 
     let velocity = ball.velocity.getDirection();
