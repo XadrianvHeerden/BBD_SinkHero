@@ -2,7 +2,7 @@ import { Vector2 } from "./physics.js";
 import { clamp, round } from "./utils.js";
 
 const MAX_VELOCITY = 300;
-const MAX_ACCELARATION = 100;
+const MAX_ACCELARATION = 50;
 
 let ball = { radius: 10, position: new Vector2(), velocity: new Vector2(), acceleration: new Vector2() }
 let previousTimeStamp = 0;
@@ -16,7 +16,10 @@ function animate(timeStamp) {
     let canvas = document.getElementById("maze");
     let ctx = canvas.getContext("2d");
 
-    ctx.clearRect(ball.position.x - ball.radius - 1, ball.position.y - ball.radius - 1, (ball.radius + 1) * 2, (ball.radius + 1) * 2);
+    ctx.clearRect(
+        ball.position.x - ball.radius - 1,
+        ball.position.y - ball.radius - 1,
+        (ball.radius + 1) * 2, (ball.radius + 1) * 2);
 
     const delta = (timeStamp - previousTimeStamp) / 1000.0;
     
