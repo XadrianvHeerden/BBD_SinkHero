@@ -2,7 +2,7 @@ import { Vector2 } from "./physics.js";
 import { clamp, round } from "./utils.js";
 
 const MAX_VELOCITY = 300;
-const MAX_ACCELARATION = 1000;
+const MAX_ACCELARATION = 100;
 
 let ball = { radius: 10, position: new Vector2(), velocity: new Vector2(), acceleration: new Vector2() }
 let previousTimeStamp = 0;
@@ -38,7 +38,7 @@ function animate(timeStamp) {
     ctx.arc(ball.position.x, ball.position.y, ball.radius, 0, 2 * Math.PI);
     ctx.stroke();
 
-    stats.innerText = `x: ${ball.position.x}, y: ${ball.position.y}, acceleration.x: ${ball.acceleration.x}, acceleration.y: ${ball.acceleration.y}, velocity.x: ${ball.velocity.x}, velocity.y: ${ball.velocity.y}`; 
+    stats.innerText = `x: ${round(ball.position.x, 2)}, y: ${round(ball.position.y, 2)}, ax: ${round(ball.acceleration.x, 2)}, ay: ${round(ball.acceleration.y, 2)}, vx: ${round(ball.velocity.x, 2)}, vy: ${round(ball.velocity.y, 2)}`; 
 
     previousTimeStamp = timeStamp;
     window.requestAnimationFrame(animate);
