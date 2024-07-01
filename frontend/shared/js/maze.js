@@ -1,4 +1,3 @@
-
 const MAZE = [
     [1, 1, 1, 1],
     [1, 0, 0, 1],
@@ -10,6 +9,8 @@ const MAZE = [
 
 const ROWS = MAZE.length, COLUMNS = MAZE[0].length;
 const TILE_SIZE = 64;
+
+let ball = { x: 0, y: 0, v: 10, d: 180 }
 
 function draw_maze(maze) {
     let canvas = document.getElementById("maze");
@@ -23,19 +24,50 @@ function draw_maze(maze) {
     }
 }
 
-function handleOrientation(event) {
-    const alpha = event.alpha; // Z-axis rotation
-    const beta = event.beta;   // X-axis rotation
-    const gamma = event.gamma; // Y-axis rotation
+// let oldTimeStamp = 0;
+// const animationSpeed = 5; // Adjust as needed
 
+// function animate(timeStamp) {
+//     const timePassed = (timeStamp - oldTimeStamp) / 1000.0;
+//     oldTimeStamp = timeStamp;
+//     const speed = timePassed / animationSpeed;
+    
+//     ball.x += ball.v * Math.cos(ball.d * (Math.PI / 180)) * speed;
+//     ball.y += ball.v * Math.sin(ball.d * (Math.PI / 180)) * speed;
+    
+//     console.log(`x: ${ball.x}, timePassed: ${timePassed}`);
+    
+//     let canvas = document.getElementById("maze");
+//     let ctx = canvas.getContext("2d");
+    
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+//     ctx.beginPath();
+//     ctx.arc(ball.x, ball.y, 10, 0, 2 * Math.PI);
+//     ctx.stroke();
+    
+//     window.requestAnimationFrame(animate);
+// }
+
+// let stats = document.getElementById("stats");
+// stats.innerText = "hi";
+
+
+let stats = document.getElementById("stats");
+    // stats.innerText = "hello";
+stats.innerText = `a: ${window.DeviceOrientationEvent}`; 
+
+window.addEventListener("deviceorientation", (event) => {
+    const x = event.alpha;
+    const y = event.beta;
+    const z = event.gamma;
+    
+    ball.d = x ? x : 0;
+    
     let stats = document.getElementById("stats");
-    stats.innerText = `a: ${alpha}, b: ${beta}, g: ${gamma}`; 
-    // Your custom logic here based on the orientation data
-}
+    // stats.innerText = "hello";
+    stats.innerText = `a: ${x}, b: ${y}, g: ${z}`; 
+}, true);
 
-
-window.addEventListener("deviceorientation", handleOrientation, true);
-
-
+// window.requestAnimationFrame(animate);
 
 draw_maze(MAZE);
