@@ -16,6 +16,7 @@ const io = socketIo(server);
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 let hosts = [];
 let players = [];
 let games = [];
@@ -89,6 +90,11 @@ let games = [];
 =======
 let games = {};
 >>>>>>> abf9f19 (updated game states)
+=======
+let hosts = [];
+let players = [];
+let games = [];
+>>>>>>> 694a92a (rebase)
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './../public', 'index.html'));
@@ -112,10 +118,35 @@ app.get('/host', (req, res) => {
 io.on('connection', (socket) => {
     console.log('A player connected:', socket.id);
 
-    socket.on('hostAccessed', () => {
-        console.log(`Host accessed by socket: ${socket.id}`);
-        socket.isHost = true;
+    socket.on("hostConnected", (data) => {
+        console.log(`Host con: ${data.socketId}`);
+
+        players.forEach((player) => {
+            console.log(`player: ${player.id}`);
+
+            if (player.id == data.socketId) {
+                hosts.push(player);
+                console.log("host found.");
+            }
+        });
     });
+
+    socket.emit("checkHost", {socketId: socket.id});
+
+    socket.on("hostConnected", (data) => {
+        console.log(`Host con: ${data.socketId}`);
+
+        players.forEach((player) => {
+            console.log(`player: ${player.id}`);
+
+            if (player.id == data.socketId) {
+                hosts.push(player);
+                console.log("host found.");
+            }
+        });
+    });
+
+    socket.emit("checkHost", {socketId: socket.id});
 
     socket.on('joinGame', (data) => {
         const { gameId, username } = data;
@@ -341,8 +372,10 @@ io.on('connection', (socket) => {
 =======
 >>>>>>> 13aa53c (updated)
 
+            let colours = ["#ff0000", "#ffff00", "#ff00ff", "#0000ff"];
+
             games[gameId].players.forEach((player, index) => {
-                player.emit('gameStart', { gameId, playerId: index, name: player.name });
+                player.emit('gameStart', { gameId, playerId: index, name: player.name , x: 0, y: 0, colour: colours[index] });
                 player.join(gameId); // Join a room with the gameId
             });
 
@@ -419,6 +452,15 @@ io.on('connection', (socket) => {
     socket.on('nextRound', (data) => {
         // Start the next round
         startRound(data.gameId);
+    });
+
+    socket.on("playerPositionChanged", (data) => {
+        console.log(`playerId: ${data.playerId} is at (${data.x}, ${data.y}).`);
+
+        console.log(hosts);
+        hosts.forEach(host => {
+            host.emit("playerPositionChangedHost", data);
+        })
     });
 });
 

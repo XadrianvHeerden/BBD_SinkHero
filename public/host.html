@@ -13,9 +13,19 @@
             const socket = io();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             socket.emit("hostConnected", {});
 =======
 >>>>>>> 8780c10 (added files)
+=======
+            let socketId = null;
+
+            socket.on("checkHost", (data) => {
+                socket.emit("hostConnected", {socketId: data.socketId});
+            });
+
+
+>>>>>>> 694a92a (rebase)
             document.getElementById('listGamesButton').addEventListener('click', () => {
                 fetch('/games')
                     .then(response => response.json())
@@ -34,6 +44,7 @@
                     });
             });
 <<<<<<< HEAD
+<<<<<<< HEAD
 
             let previous_positions = {};
             let canvas = document.getElementById("maze");
@@ -44,25 +55,40 @@
 
                 if (previous_position)
                     ctx.clearRect(previous_position.x - 11, previous_position.y - 11, 22, 22);
+=======
+
+            socket.on("playerPositionChangedHost", (data) => {
+                let canvas = document.getElementById("maze");
+                let ctx = canvas.getContext("2d");
+>>>>>>> 694a92a (rebase)
 
                 ctx.beginPath();
                 ctx.arc(data.x, data.y, 10, 0, 2 * Math.PI);
                 ctx.fillStyle = data.colour;
                 ctx.fill();
+<<<<<<< HEAD
 
                 previous_positions[data.playerId] = { x: data.x, y: data.y };
             });
 =======
 >>>>>>> 8780c10 (added files)
+=======
+            });
+>>>>>>> 694a92a (rebase)
         });
     </script>
 </head>
 <body>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <canvas id="maze" style="border: 1px solid black" width="500" height="500"></canvas>
 
 =======
 >>>>>>> 8780c10 (added files)
+=======
+    <canvas id="maze" style="border: 1px solid black" width="500" height="500"></canvas>
+
+>>>>>>> 694a92a (rebase)
     <h1>Multiplayer Host</h1>
     <div id="hostSection">
         <button id="listGamesButton">List Games</button>
