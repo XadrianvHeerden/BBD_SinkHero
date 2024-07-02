@@ -141,18 +141,7 @@
             });
 
             document.getElementById('submitPositionButton').addEventListener('click', () => {
-                const position = document.getElementById('positionInput').value;
-                const gameId = document.getElementById('gameInfo').getAttribute('data-game-id');
-                const playerId = document.getElementById('gameInfo').getAttribute('data-player-id');
-                if (position && gameId && playerId) {
-                    socket.emit('endRound', {
-                        gameId: parseInt(gameId),
-                        playerId: parseInt(playerId),
-                        positions: [ // This array should be provided with all player positions, adjust as needed
-                            { playerId: parseInt(playerId), points: parseInt(position) }
-                        ]
-                    });
-                }
+                socket.emit('endRound', {});
             });
 
             socket.on('waiting', (data) => {
@@ -160,6 +149,8 @@
                 document.getElementById('waitingMessage').style.display = '';
                 document.getElementById('waitingMessage').innerText = `Waiting for more players... (${data.playersCount}/4)`;
                 document.getElementById('startSection').style.display = data.playersCount >= 2 ? 'block' : 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+
             });
 
             socket.on('gameStart', (data) => {
@@ -181,11 +172,17 @@
 >>>>>>> db92fa2 (added ability for 2 to 4 people to play)
 =======
                 document.getElementById('positionSection').style.display = 'block';
+<<<<<<< HEAD
 >>>>>>> 8780c10 (added files)
+=======
+                document.getElementById('errorMessage').style.display = 'none';
+
+>>>>>>> 13aa53c (updated)
             });
 
             socket.on('playerLeft', (data) => {
                 console.log(`Player ${data.playerId} left the game`);
+<<<<<<< HEAD
 <<<<<<< HEAD
                 document.getElementById('errorMessage').style.display = 'none';
 
@@ -270,6 +267,10 @@
     <p>Open this page in multiple tabs to simulate multiple players connecting.</p>
     </div>
 =======
+=======
+                document.getElementById('errorMessage').style.display = 'none';
+
+>>>>>>> 13aa53c (updated)
             });
 
             socket.on('gameEnded', (data) => {
@@ -281,6 +282,23 @@
                 document.getElementById('joinSection').style.display = 'block';
                 document.getElementById('startSection').style.display = 'none';
                 document.getElementById('positionSection').style.display = 'none';
+                document.getElementById('waitingMessage').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+            });
+
+            socket.on('getPositions', (data) => {
+                const position = document.getElementById('positionInput').value;
+                const gameId = document.getElementById('gameInfo').getAttribute('data-game-id');
+                const playerId = document.getElementById('gameInfo').getAttribute('data-player-id');
+                if (position && gameId && playerId) {
+                    socket.emit('receivePositions', {
+                        gameId: parseInt(gameId),
+                        playerId: parseInt(playerId),
+                        positions: [ // This array should be provided with all player positions, adjust as needed
+                            { playerId: parseInt(playerId), position: parseInt(position) }
+                        ]
+                    });
+                }
             });
 
             socket.on('pointsUpdated', (data) => {
@@ -290,6 +308,8 @@
                     pointsInfo += `<p>Player ${player.playerId}: ${player.points} points</p>`;
                 });
                 document.getElementById('gameInfo').innerHTML += pointsInfo;
+                document.getElementById('errorMessage').style.display = 'none';
+
             });
 
             socket.on('error', (data) => {
