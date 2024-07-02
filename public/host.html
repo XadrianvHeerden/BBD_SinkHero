@@ -27,14 +27,22 @@
                     });
             });
 
+            let previous_positions = {};
+            let canvas = document.getElementById("maze");
+            let ctx = canvas.getContext("2d");
+
             socket.on("playerPositionChangedHost", (data) => {
-                let canvas = document.getElementById("maze");
-                let ctx = canvas.getContext("2d");
+                let previous_position = previous_positions[data.playerId];
+
+                if (previous_position)
+                    ctx.clearRect(previous_position.x - 11, previous_position.y - 11, 22, 22);
 
                 ctx.beginPath();
                 ctx.arc(data.x, data.y, 10, 0, 2 * Math.PI);
                 ctx.fillStyle = data.colour;
                 ctx.fill();
+
+                previous_positions[data.playerId] = { x: data.x, y: data.y };
             });
         });
     </script>
