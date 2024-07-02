@@ -23,8 +23,11 @@ function update(timeStamp) {
         (ball.radius + 1) * 2, (ball.radius + 1) * 2);
 
     const delta = (timeStamp - previousTimeStamp) / (1000.0 / FRAME_RATE);
-    ball.acceleration.scale(MAX_ACCELARATION);
-    ball.velocity.add(ball.acceleration);
+
+    let acceleration = ball.acceleration.getCopy();
+    acceleration.scale(MAX_ACCELARATION);
+
+    ball.velocity.add(acceleration);
     ball.velocity.clamp(new Vector2(-MAX_VELOCITY), new Vector2(MAX_VELOCITY));
     ball.velocity.scale(FRICTION);
 
