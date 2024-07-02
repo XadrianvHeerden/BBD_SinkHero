@@ -83,7 +83,7 @@
                 vy: 0,
 
                 data: null,
-            };
+            }
 
             const FRAME_RATE = 30;
             let previousTimeStamp = performance.now();
@@ -102,6 +102,9 @@
 
                 const delta = (timeStamp - previousTimeStamp) / (1000.0 / FRAME_RATE);
 
+                let acceleration = ball.acceleration.getCopy();
+                acceleration.scale(MAX_ACCELARATION);
+
                 ball.data.x += ball.vx * delta;
                 ball.data.y += ball.vy * delta;
 
@@ -110,7 +113,7 @@
                 ctx.fillStyle = ball.data.colour;
                 ctx.fill();
 
-                socket.emit("playerPositionChanged", ball.data);
+                socket.emit("playerPositionChanged", player.data);
 
                 previousTimeStamp = timeStamp;
                 requestAnimationFrame(update);
@@ -119,9 +122,8 @@
 >>>>>>> 694a92a (rebase)
             document.getElementById('joinButton').addEventListener('click', () => {
                 const name = document.getElementById('nameInput').value;
-                const gameId = document.getElementById('gameIdInput').value;
-                if (name && gameId) {
-                    socket.emit('joinGame', { username: name, gameId: gameId });
+                if (name) {
+                    socket.emit('setName', { name: name });
                     document.getElementById('gameInfo').innerHTML = ``;
                 }
             });
@@ -131,7 +133,18 @@
             });
 
             document.getElementById('submitPositionButton').addEventListener('click', () => {
-                socket.emit('endRound', {});
+                const position = document.getElementById('positionInput').value;
+                const gameId = document.getElementById('gameInfo').getAttribute('data-game-id');
+                const playerId = document.getElementById('gameInfo').getAttribute('data-player-id');
+                if (position && gameId && playerId) {
+                    socket.emit('endRound', {
+                        gameId: parseInt(gameId),
+                        playerId: parseInt(playerId),
+                        positions: [ // This array should be provided with all player positions, adjust as needed
+                            { playerId: parseInt(playerId), points: parseInt(position) }
+                        ]
+                    });
+                }
             });
 
             socket.on('waiting', (data) => {
@@ -139,8 +152,6 @@
                 document.getElementById('waitingMessage').style.display = '';
                 document.getElementById('waitingMessage').innerText = `Waiting for more players... (${data.playersCount}/4)`;
                 document.getElementById('startSection').style.display = data.playersCount >= 2 ? 'block' : 'none';
-                document.getElementById('errorMessage').style.display = 'none';
-
             });
 
             socket.on('gameStart', (data) => {
@@ -158,6 +169,7 @@
                 document.getElementById('startSection').style.display = 'none';
                 document.getElementById('waitingMessage').style.display = 'none';
                 document.getElementById('positionSection').style.display = 'block';
+<<<<<<< HEAD
 <<<<<<< HEAD
                 document.getElementById('errorMessage').style.display = 'none';
 
@@ -226,21 +238,29 @@
 >>>>>>> 13aa53c (updated)
 =======
 =======
+=======
+>>>>>>> 532e2c7 (simple position updates between back and front)
                 
                 document.getElementById('maze').style.display = 'block';
 
                 ball.data = data;
                 requestAnimationFrame(update);
+<<<<<<< HEAD
 >>>>>>> 019c9ad (multiplayer tests)
 >>>>>>> 694a92a (rebase)
+=======
+>>>>>>> 532e2c7 (simple position updates between back and front)
             });
 
             socket.on('playerLeft', (data) => {
                 console.log(`Player ${data.playerId} left the game`);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 document.getElementById('errorMessage').style.display = 'none';
 
+=======
+>>>>>>> 532e2c7 (simple position updates between back and front)
             });
 
             socket.on('gameEnded', (data) => {
@@ -252,23 +272,6 @@
                 document.getElementById('joinSection').style.display = 'block';
                 document.getElementById('startSection').style.display = 'none';
                 document.getElementById('positionSection').style.display = 'none';
-                document.getElementById('waitingMessage').style.display = 'none';
-                document.getElementById('errorMessage').style.display = 'none';
-            });
-
-            socket.on('getPositions', (data) => {
-                const position = document.getElementById('positionInput').value;
-                const gameId = document.getElementById('gameInfo').getAttribute('data-game-id');
-                const playerId = document.getElementById('gameInfo').getAttribute('data-player-id');
-                if (position && gameId && playerId) {
-                    socket.emit('receivePositions', {
-                        gameId: parseInt(gameId),
-                        playerId: parseInt(playerId),
-                        positions: [ // This array should be provided with all player positions, adjust as needed
-                            { playerId: parseInt(playerId), position: parseInt(position) }
-                        ]
-                    });
-                }
             });
 
             socket.on('pointsUpdated', (data) => {
@@ -278,13 +281,6 @@
                     pointsInfo += `<p>Player ${player.playerId}: ${player.points} points</p>`;
                 });
                 document.getElementById('gameInfo').innerHTML += pointsInfo;
-                document.getElementById('errorMessage').style.display = 'none';
-
-            });
-
-            socket.on('error', (data) => {
-                console.error(data.message);
-                document.getElementById('errorMessage').innerText = data.message;
             });
 
             addEventListener("deviceorientation", (event) => {
@@ -383,7 +379,6 @@
 
     <h1>Multiplayer Game</h1>
     <div id="joinSection">
-        <input type="text" id="gameIdInput" placeholder="Enter game ID">
         <input type="text" id="nameInput" placeholder="Enter your name">
         <button id="joinButton">Join Game</button>
     </div>
@@ -396,7 +391,6 @@
         <button id="submitPositionButton">Submit Position</button>
     </div>
     <div id="gameInfo"></div>
-    <div id="errorMessage" style="color: red;"></div>
     <p>Open this page in multiple tabs to simulate multiple players connecting.</p>
 <<<<<<< HEAD
 <<<<<<< HEAD

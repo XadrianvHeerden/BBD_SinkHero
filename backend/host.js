@@ -119,34 +119,9 @@ io.on('connection', (socket) => {
     console.log('A player connected:', socket.id);
 
     socket.on("hostConnected", (data) => {
-        console.log(`Host con: ${data.socketId}`);
-
-        players.forEach((player) => {
-            console.log(`player: ${player.id}`);
-
-            if (player.id == data.socketId) {
-                hosts.push(player);
-                console.log("host found.");
-            }
-        });
+        hosts.push(socket);
+        console.log(hosts);
     });
-
-    socket.emit("checkHost", {socketId: socket.id});
-
-    socket.on("hostConnected", (data) => {
-        console.log(`Host con: ${data.socketId}`);
-
-        players.forEach((player) => {
-            console.log(`player: ${player.id}`);
-
-            if (player.id == data.socketId) {
-                hosts.push(player);
-                console.log("host found.");
-            }
-        });
-    });
-
-    socket.emit("checkHost", {socketId: socket.id});
 
     socket.on('joinGame', (data) => {
         const { gameId, username } = data;
