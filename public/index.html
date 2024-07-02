@@ -129,8 +129,9 @@
 
             document.getElementById('joinButton').addEventListener('click', () => {
                 const name = document.getElementById('nameInput').value;
-                if (name) {
-                    socket.emit('setName', { name: name });
+                const gameId = document.getElementById('gameIdInput').value;
+                if (name && gameId) {
+                    socket.emit('joinGame', { username: name, gameId: gameId });
                     document.getElementById('gameInfo').innerHTML = ``;
                 }
             });
@@ -290,12 +291,18 @@
                 });
                 document.getElementById('gameInfo').innerHTML += pointsInfo;
             });
+
+            socket.on('error', (data) => {
+                console.error(data.message);
+                document.getElementById('errorMessage').innerText = data.message;
+            });
         });
     </script>
 </head>
 <body>
     <h1>Multiplayer Game</h1>
     <div id="joinSection">
+        <input type="text" id="gameIdInput" placeholder="Enter game ID">
         <input type="text" id="nameInput" placeholder="Enter your name">
         <button id="joinButton">Join Game</button>
     </div>
@@ -308,6 +315,7 @@
         <button id="submitPositionButton">Submit Position</button>
     </div>
     <div id="gameInfo"></div>
+    <div id="errorMessage" style="color: red;"></div>
     <p>Open this page in multiple tabs to simulate multiple players connecting.</p>
 <<<<<<< HEAD
 <<<<<<< HEAD

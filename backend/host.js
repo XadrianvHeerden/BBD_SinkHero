@@ -15,6 +15,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 let hosts = [];
 let players = [];
 let games = [];
@@ -85,16 +86,20 @@ io.on('connection', (socket) => {
 =======
 let players = [];
 let games = [];
+=======
+let games = {};
+>>>>>>> abf9f19 (updated game states)
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './../public', 'index.html'));
 });
 
 app.get('/games', (req, res) => {
-    const gameList = games.map((game, gameId) => ({
+    const gameList = Object.keys(games).map((gameId) => ({
         gameId,
-        players: game.players.map(player => ({ name: player.name, points: player.points })),
-        currentRound: game.currentRound
+        players: games[gameId].players.map(player => ({ name: player.name, points: player.points })),
+        currentRound: games[gameId].currentRound,
+        status: games[gameId].status
     }));
     res.json(gameList);
 });
@@ -106,15 +111,31 @@ app.get('/host', (req, res) => {
 io.on('connection', (socket) => {
     console.log('A player connected:', socket.id);
 
-    socket.on('setName', (data) => {
-        socket.name = data.name;
+    socket.on('joinGame', (data) => {
+        const { gameId, username } = data;
+        
+        if (!games[gameId]) {
+            games[gameId] = { players: [], currentRound: 0, status: 'waiting' };
+        }
+
+        if (games[gameId].status !== 'waiting') {
+            socket.emit('error', { message: 'Game already started. You cannot join.' });
+            return;
+        }
+
+        if (games[gameId].players.find(player => player.name === username)) {
+            socket.emit('error', { message: 'Username already taken in this game.' });
+            return;
+        }
+
+        socket.name = username;
         socket.points = 0;
         socket.currentRound = 0;
-        players.push(socket);
+        socket.gameId = gameId;
 
-        // Notify all players about the current waiting status
-        io.emit('waiting', { playersCount: players.length });
+        games[gameId].players.push(socket);
 
+<<<<<<< HEAD
         if (players.length === 4) {
 <<<<<<< HEAD
             let game = players.splice(0, 4);
@@ -141,17 +162,25 @@ io.on('connection', (socket) => {
 >>>>>>> db92fa2 (added ability for 2 to 4 people to play)
 =======
 >>>>>>> 8780c10 (added files)
+=======
+        // Notify all players in the game about the current waiting status
+        games[gameId].players.forEach(player => player.emit('waiting', { playersCount: games[gameId].players.length }));
+
+        if (games[gameId].players.length === 4) {
+            startGame(gameId);
+>>>>>>> abf9f19 (updated game states)
         }
     });
 >>>>>>> 2ef70e2 (Basic backend to connect to server)
 
     socket.on('startGame', () => {
-        startGame();
+        startGame(socket.gameId);
     });
 
     socket.on('disconnect', () => {
         console.log('A player disconnected:', socket.id);
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         const gameId = socket.gameId;
@@ -267,16 +296,17 @@ io.on('connection', (socket) => {
 =======
 >>>>>>> 5d4b510 (End when insufficient players connected)
         players = players.filter(player => player.id !== socket.id);
+=======
+        const gameId = socket.gameId;
+        if (!gameId) return;
+>>>>>>> abf9f19 (updated game states)
 
-        // Notify all players about the current waiting status
-        io.emit('waiting', { playersCount: players.length });
+        games[gameId].players = games[gameId].players.filter(player => player.id !== socket.id);
 
-        games.forEach((game, gameId) => {
-            let index = game.players.indexOf(socket);
-            if (index !== -1) {
-                game.players.splice(index, 1);
-                game.players.forEach(player => player.emit('playerLeft', { playerId: index }));
+        // Notify all players in the game about the current waiting status
+        games[gameId].players.forEach(player => player.emit('waiting', { playersCount: games[gameId].players.length }));
 
+<<<<<<< HEAD
                 // If only one or no players are left, remove the game
                 if (game.players.length <= 1) {
                     game.players.forEach(player => player.emit('gameEnded', { gameId: gameId }));
@@ -286,19 +316,28 @@ io.on('connection', (socket) => {
             }
         });
 >>>>>>> df5a9d6 (added host)
+=======
+        if (games[gameId].players.length <= 1) {
+            games[gameId].players.forEach(player => player.emit('gameEnded', { gameId }));
+            delete games[gameId];
+            console.log(`Game ${gameId} ended due to insufficient players.`);
+        } else {
+            games[gameId].players.forEach(player => player.emit('playerLeft', { playerId: socket.id }));
+        }
+>>>>>>> abf9f19 (updated game states)
     });
 
-    const startGame = () => {
-        if (players.length >= 2) {
-            let gamePlayers = players.splice(0, players.length);
-            let gameId = games.length;
-            games.push({ players: gamePlayers, currentRound: 0 });
+    const startGame = (gameId) => {
+        if (games[gameId].players.length >= 2) {
+            games[gameId].status = 'in-progress';
+            games[gameId].currentRound = 1;
 
-            gamePlayers.forEach((player, index) => {
-                player.emit('gameStart', { gameId: gameId, playerId: index, name: player.name });
+            games[gameId].players.forEach((player, index) => {
+                player.emit('gameStart', { gameId, playerId: index, name: player.name });
+                player.join(gameId); // Join a room with the gameId
             });
 
-            console.log(`Game ${gameId} started with players:`, gamePlayers.map(p => p.id + " (" + p.name + ")"));
+            console.log(`Game ${gameId} started with players:`, games[gameId].players.map(p => p.id + " (" + p.name + ")"));
 
             // Start the first round
             startRound(gameId);
@@ -308,8 +347,7 @@ io.on('connection', (socket) => {
     const startRound = (gameId) => {
         const game = games[gameId];
         game.currentRound++;
-        
-        // Check if the game should end
+
         if (game.currentRound > 4) {
             endGame(gameId);
         } else {
@@ -328,7 +366,7 @@ io.on('connection', (socket) => {
             player.emit('gameEnded', { winner: winner.name, points: winner.points });
         });
 
-        games.splice(gameId, 1);
+        delete games[gameId];
         console.log(`Game ${gameId} ended. Winner: ${winner.name} with ${winner.points} points.`);
     };
 
@@ -336,13 +374,9 @@ io.on('connection', (socket) => {
         const game = games[data.gameId];
         const positions = data.positions;
 
-        game.players.forEach(p => {
-            p.emit('updatePoints', { playerId: positionData.playerId, points: player.points });
-        });
-
         if (positions) {
-            positions.forEach((positionData, index) => {
-                const player = game.players[positionData.playerId];
+            positions.forEach((positionData) => {
+                const player = game.players.find(p => p.id === positionData.playerId);
                 player.points += positionData.points;
 
                 // Notify all players of the updated points
@@ -352,7 +386,7 @@ io.on('connection', (socket) => {
             });
 
             // Start the next round
-            // startRound(data.gameId);
+            startRound(data.gameId);
         } else {
             console.error('Positions data is missing in endRound event');
         }
