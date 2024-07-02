@@ -5,14 +5,15 @@ const MAX_VELOCITY = 300;
 const MAX_ACCELARATION = 10;
 
 let ball = { radius: 10, position: new Vector2(), velocity: new Vector2(), acceleration: new Vector2() }
-let previousTimeStamp = 0;
+let previousTimeStamp = performance.now();
 
 const FRICTION = 0.8;
 
 // for debugging
 let stats = document.getElementById("stats");
+const FRAME_RATE = 60;
 
-function animate(timeStamp) {
+function update(timeStamp) {
     let canvas = document.getElementById("maze");
     let ctx = canvas.getContext("2d");
 
@@ -21,12 +22,11 @@ function animate(timeStamp) {
         ball.position.y - ball.radius - 1,
         (ball.radius + 1) * 2, (ball.radius + 1) * 2);
 
-    const delta = (timeStamp - previousTimeStamp) / 1000.0;
-    ball.acceleration.scale(MAX_ACCELARATION * delta);
+    const delta = (timeStamp - previousTimeStamp) / (1000.0 / FRAME_RATE);
+    ball.acceleration.scale(MAX_ACCELARATION);
     ball.velocity.add(ball.acceleration);
-    ball.velocity.scale(FRICTION);
-
     ball.velocity.clamp(new Vector2(-MAX_VELOCITY), new Vector2(MAX_VELOCITY));
+    ball.velocity.scale(FRICTION);
 
     let velocity = ball.velocity.getDirection();
     velocity.scale(MAX_VELOCITY * delta);
@@ -36,20 +36,20 @@ function animate(timeStamp) {
     
     ctx.beginPath();
     ctx.arc(ball.position.x, ball.position.y, ball.radius, 0, 2 * Math.PI);
-    ctx.stroke();
+    ctx.fillStyle = 'cornflowerblue';
+    ctx.fill();
 
     stats.innerText = `x: ${round(ball.position.x, 2)}, y: ${round(ball.position.y, 2)}, ax: ${round(ball.acceleration.x, 2)}, ay: ${round(ball.acceleration.y, 2)}, vx: ${round(ball.velocity.x, 2)}, vy: ${round(ball.velocity.y, 2)}`; 
 
     previousTimeStamp = timeStamp;
-    window.requestAnimationFrame(animate);
+    requestAnimationFrame(update);
 }
 
-window.requestAnimationFrame(animate);
-window.addEventListener("deviceorientation", (event) => {
+addEventListener("deviceorientation", (event) => {
     const y = round(event.beta / 180, 2);
     const z = round(event.gamma / 90, 2);
     
-    ball.acceleration.x = z;
-    ball.acceleration.y = y;
-    // stats.innerText = `acceleration.x: ${z}, acceleration.y: ${y}`
+    ball.acceleration.set(z, y);
+    stats.innerText = `acceleration.x: ${z}, acceleration.y: ${y}`
+    requestAnimationFrame(update);
 }, true);

@@ -51,19 +51,11 @@ export class Vector2 {
         this.y = clamp(this.y, min.y, max.y);
     }
 
-    move_toward(end, speed) {
-        end = end.getCopy();
-        end.minus(this);
-        let direction = end.getDirection();
-        direction.scale(speed);
-
-        this.add(direction)
-    }
-
     lerp(end, weight) {
         this.x = lerp(this.x, end.x, weight);
         this.y = lerp(this.y, end.y, weight);
     }
+
     approx_equals(other, tolerance = 0.05) {
         return approx_equals(this.x, other.x, tolerance) && approx_equals(this.y, other.y, tolerance);
     }
@@ -71,6 +63,7 @@ export class Vector2 {
     getCopy() {
         return new Vector2(this.x, this.y);
     }
+
     getMagnitude() {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
