@@ -10,6 +10,9 @@ const io = socketIo(server);
 let hosts = [];
 let players = [];
 let games = [];
+let hosts = [];
+let players = [];
+let games = [];
 
 app.use(express.static(path.join(__dirname, '../public')));
 
