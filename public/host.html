@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Host</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const socket = io();
+
+            document.getElementById('listGamesButton').addEventListener('click', () => {
+                fetch('/games')
+                    .then(response => response.json())
+                    .then(data => {
+                        const gamesList = document.getElementById('gamesList');
+                        gamesList.innerHTML = '';
+                        data.forEach(game => {
+                            const gameItem = document.createElement('div');
+                            gameItem.innerHTML = `
+                                <h3>Game ${game.gameId}</h3>
+                                <p>Players: ${game.players.map(player => `${player.name} (${player.points} points)`).join(', ')}</p>
+                                <p>Current Round: ${game.currentRound}</p>
+                            `;
+                            gamesList.appendChild(gameItem);
+                        });
+                    });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Multiplayer Host</h1>
+    <div id="hostSection">
+        <button id="listGamesButton">List Games</button>
+        <div id="gamesList"></div>
+    </div>
+</body>
+</html>

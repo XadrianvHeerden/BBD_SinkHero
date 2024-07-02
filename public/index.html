@@ -12,7 +12,7 @@
                 const name = document.getElementById('nameInput').value;
                 if (name) {
                     socket.emit('setName', { name: name });
-                    document.getElementById('gameInfo').innerHTML = ` `;
+                    document.getElementById('gameInfo').innerHTML = ``;
                 }
             });
 
@@ -20,12 +20,26 @@
                 socket.emit('startGame');
             });
 
+            document.getElementById('submitPositionButton').addEventListener('click', () => {
+                const position = document.getElementById('positionInput').value;
+                const gameId = document.getElementById('gameInfo').getAttribute('data-game-id');
+                const playerId = document.getElementById('gameInfo').getAttribute('data-player-id');
+                if (position && gameId && playerId) {
+                    socket.emit('endRound', {
+                        gameId: parseInt(gameId),
+                        playerId: parseInt(playerId),
+                        positions: [ // This array should be provided with all player positions, adjust as needed
+                            { playerId: parseInt(playerId), points: parseInt(position) }
+                        ]
+                    });
+                }
+            });
+
             socket.on('waiting', (data) => {
+                document.getElementById('joinSection').style.display = 'none';
                 document.getElementById('waitingMessage').style.display = '';
                 document.getElementById('waitingMessage').innerText = `Waiting for more players... (${data.playersCount}/4)`;
-                if(data.playersCount >= 2){
-                    document.getElementById('startSection').style.display = '';
-                }
+                document.getElementById('startSection').style.display = data.playersCount >= 2 ? 'block' : 'none';
             });
 
             socket.on('gameStart', (data) => {
@@ -35,30 +49,16 @@
                     <p>Game ID: ${data.gameId}</p>
                     <p>You are Player ${data.playerId} (Name: ${data.name})</p>
                 `;
+                document.getElementById('gameInfo').setAttribute('data-game-id', data.gameId);
+                document.getElementById('gameInfo').setAttribute('data-player-id', data.playerId);
                 document.getElementById('joinSection').style.display = 'none';
                 document.getElementById('startSection').style.display = 'none';
                 document.getElementById('waitingMessage').style.display = 'none';
+                document.getElementById('positionSection').style.display = 'block';
             });
 
             socket.on('playerLeft', (data) => {
                 console.log(`Player ${data.playerId} left the game`);
-            });
-
-            document.getElementById('listGamesButton').addEventListener('click', () => {
-            fetch('/games')
-                .then(response => response.json())
-                .then(data => {
-                    const gamesList = document.getElementById('gamesList');
-                    gamesList.innerHTML = '';
-                    data.forEach(game => {
-                        const gameItem = document.createElement('div');
-                        gameItem.innerHTML = `
-                            <h3>Game ${game.gameId}</h3>
-                            <p>Players: ${game.players.join(', ')}</p>
-                        `;
-                        gamesList.appendChild(gameItem);
-                    });
-                });
             });
 
             socket.on('gameEnded', (data) => {
@@ -69,10 +69,18 @@
                 `;
                 document.getElementById('joinSection').style.display = 'block';
                 document.getElementById('startSection').style.display = 'none';
+                document.getElementById('positionSection').style.display = 'none';
+            });
+
+            socket.on('pointsUpdated', (data) => {
+                console.log('Points updated', data);
+                let pointsInfo = '';
+                data.players.forEach(player => {
+                    pointsInfo += `<p>Player ${player.playerId}: ${player.points} points</p>`;
+                });
+                document.getElementById('gameInfo').innerHTML += pointsInfo;
             });
         });
-
-        
     </script>
 </head>
 <body>
@@ -85,11 +93,11 @@
     <div id="startSection" style="display: none;">
         <button id="startButton">Start Game</button>
     </div>
+    <div id="positionSection" style="display: none;">
+        <input type="number" id="positionInput" placeholder="Enter your position (1-4)">
+        <button id="submitPositionButton">Submit Position</button>
+    </div>
     <div id="gameInfo"></div>
     <p>Open this page in multiple tabs to simulate multiple players connecting.</p>
-    <div id="hostSection">
-        <button id="listGamesButton">List Games</button>
-        <div id="gamesList"></div>
-    </div>
 </body>
 </html>
