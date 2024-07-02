@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .container {
     text-align: center;
     padding: 20px;
@@ -51,4 +52,8 @@ button {
 }
 .button:hover {
     background-color: #0056b3;
+=======
+#maze {
+    border: 1px solid black;
+>>>>>>> 53947d2 (multiplayer tests)
 }
