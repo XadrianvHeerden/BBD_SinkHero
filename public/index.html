@@ -171,6 +171,15 @@
                 console.error(data.message);
                 document.getElementById('errorMessage').innerText = data.message;
             });
+
+            addEventListener("deviceorientation", (event) => {
+                let x = event.alpha;
+                let y = event.beta;
+                let z = event.gamma;
+
+                ball.vx = y ? y : 1;
+                ball.vy = z ? z : 1;
+            });        
         });
 
     </script>
