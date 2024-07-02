@@ -5,8 +5,50 @@
     <title>Multiplayer Game</title>
     <script src="/socket.io/socket.io.js"></script>
     <script>
+
         document.addEventListener("DOMContentLoaded", () => {
             const socket = io();
+
+            const ball = {
+                radius: 10,
+                ax: 0,
+                ay: 0,
+                vx: 0,
+                vy: 0,
+
+                data: null,
+            };
+
+            const FRAME_RATE = 30;
+            let previousTimeStamp = performance.now();
+
+            function update(timeStamp) {
+                if (!ball.data)
+                    return;
+
+                let canvas = document.getElementById("maze");
+                let ctx = canvas.getContext("2d");
+
+                ctx.clearRect(
+                    ball.data.x - ball.radius - 1,
+                    ball.data.y - ball.radius - 1,
+                    (ball.radius + 1) * 2, (ball.radius + 1) * 2);
+
+                const delta = (timeStamp - previousTimeStamp) / (1000.0 / FRAME_RATE);
+
+                ball.data.x += ball.vx * delta;
+                ball.data.y += ball.vy * delta;
+
+                ctx.beginPath();
+                ctx.arc(ball.data.x, ball.data.y, ball.radius, 0, 2 * Math.PI);
+                ctx.fillStyle = ball.data.colour;
+                ctx.fill();
+
+                socket.emit("playerPositionChanged", ball.data);
+
+                previousTimeStamp = timeStamp;
+                requestAnimationFrame(update);
+            }
 
             document.getElementById('joinButton').addEventListener('click', () => {
                 const name = document.getElementById('nameInput').value;
@@ -47,8 +89,16 @@
                 document.getElementById('startSection').style.display = 'none';
                 document.getElementById('waitingMessage').style.display = 'none';
                 document.getElementById('positionSection').style.display = 'block';
+<<<<<<< HEAD
                 document.getElementById('errorMessage').style.display = 'none';
 
+=======
+                
+                document.getElementById('maze').style.display = 'block';
+
+                ball.data = data;
+                requestAnimationFrame(update);
+>>>>>>> 019c9ad (multiplayer tests)
             });
 
             socket.on('playerLeft', (data) => {
@@ -100,10 +150,22 @@
                 console.error(data.message);
                 document.getElementById('errorMessage').innerText = data.message;
             });
+
+            addEventListener("deviceorientation", (event) => {
+                let x = event.alpha;
+                let y = event.beta;
+                let z = event.gamma;
+
+                ball.vx = y ? y : 1;
+                ball.vy = z ? z : 1;
+            });        
         });
+
     </script>
 </head>
 <body>
+    <canvas id="maze" style="display: none; border: 1px solid black" width="500" height="500"></canvas>
+
     <h1>Multiplayer Game</h1>
     <div id="joinSection">
         <input type="text" id="gameIdInput" placeholder="Enter game ID">

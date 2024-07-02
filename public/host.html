@@ -8,6 +8,13 @@
         document.addEventListener("DOMContentLoaded", () => {
             const socket = io();
 
+            let socketId = null;
+
+            socket.on("checkHost", (data) => {
+                socket.emit("hostConnected", {socketId: data.socketId});
+            });
+
+
             document.getElementById('listGamesButton').addEventListener('click', () => {
                 fetch('/games')
                     .then(response => response.json())
@@ -25,10 +32,22 @@
                         });
                     });
             });
+
+            socket.on("playerPositionChangedHost", (data) => {
+                let canvas = document.getElementById("maze");
+                let ctx = canvas.getContext("2d");
+
+                ctx.beginPath();
+                ctx.arc(data.x, data.y, 10, 0, 2 * Math.PI);
+                ctx.fillStyle = data.colour;
+                ctx.fill();
+            });
         });
     </script>
 </head>
 <body>
+    <canvas id="maze" style="border: 1px solid black" width="500" height="500"></canvas>
+
     <h1>Multiplayer Host</h1>
     <div id="hostSection">
         <button id="listGamesButton">List Games</button>
