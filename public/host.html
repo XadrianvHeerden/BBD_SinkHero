@@ -8,13 +8,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             const socket = io();
 
-            let socketId = null;
-
-            socket.on("checkHost", (data) => {
-                socket.emit("hostConnected", {socketId: data.socketId});
-            });
-
-
+            socket.emit("hostConnected", {});
             document.getElementById('listGamesButton').addEventListener('click', () => {
                 fetch('/games')
                     .then(response => response.json())
