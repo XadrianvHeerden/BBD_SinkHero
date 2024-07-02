@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/BBD_SinkHero/frontend/shared/css/main.css">
+    <title>Game Lobby</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .lobby-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .lobby-section {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], button {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: calc(100% - 22px);
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="lobby-container">
+            <h1>Game Lobby</h1>
+            <div class="lobby-section" id="createGameSection">
+                <h2>Create A Room</h2>
+                <input type="text" id="gameNameInput" placeholder="Enter game name">
+                <button onclick="createGame()">Create Room</button>
+            </div>
+            <div class="lobby-section" id="joinGameSection">
+                <h2>Join an Existing Game</h2>
+                <input type="text" id="gameIdInput" placeholder="Enter game ID">
+                <button  onclick="joinGame()">Join Game</button>
+            </div>
+        </div>
+    </div>
+    <script src="Lobby.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/BBD_SinkHero/frontend/shared/css/main.css">
+    <title>Maze Game</title>
+    <style>
+        .container {
+            max-width: 70%;
+            background-color: #b5eaff;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            font-size: 18px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Round: <span id="currentRound">1</span></h1>
+        <div id="gameInfo">
+            <h2>Scoreboard</h2>
+            <table id="scoreTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="scoreList">
+                    <!-- Scores will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+        <canvas id="mazeCanvas" width="400" height="400"></canvas>
+        <button id="nextRoundBtn" class="button">Next Round</button>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game.js"></script>
+</body>
+
+</html>
