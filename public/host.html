@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Host</title>
+<<<<<<< HEAD
     <link rel="stylesheet" href="css/player.css">
+=======
+>>>>>>> 8780c10 (added files)
     <script src="/socket.io/socket.io.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const socket = io();
 
+<<<<<<< HEAD
             socket.emit("hostConnected", {});
+=======
+>>>>>>> 8780c10 (added files)
             document.getElementById('listGamesButton').addEventListener('click', () => {
                 fetch('/games')
                     .then(response => response.json())
@@ -27,6 +33,7 @@
                         });
                     });
             });
+<<<<<<< HEAD
 
             let previous_positions = {};
             let canvas = document.getElementById("maze");
@@ -45,12 +52,17 @@
 
                 previous_positions[data.playerId] = { x: data.x, y: data.y };
             });
+=======
+>>>>>>> 8780c10 (added files)
         });
     </script>
 </head>
 <body>
+<<<<<<< HEAD
     <canvas id="maze" style="border: 1px solid black" width="500" height="500"></canvas>
 
+=======
+>>>>>>> 8780c10 (added files)
     <h1>Multiplayer Host</h1>
     <div id="hostSection">
         <button id="listGamesButton">List Games</button>
