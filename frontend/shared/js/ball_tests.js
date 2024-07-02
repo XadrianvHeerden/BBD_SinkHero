@@ -1,8 +1,8 @@
 import { Vector2 } from "./physics.js";
 import { clamp, round } from "./utils.js";
 
-const MAX_VELOCITY = 300;
-const MAX_ACCELARATION = 10;
+const MAX_VELOCITY = 12;
+const MAX_ACCELARATION = 0.3;
 
 let ball = { radius: 10, position: new Vector2(), velocity: new Vector2(), acceleration: new Vector2() }
 let previousTimeStamp = performance.now();
@@ -11,7 +11,7 @@ const FRICTION = 0.8;
 
 // for debugging
 let stats = document.getElementById("stats");
-const FRAME_RATE = 60;
+const FRAME_RATE = 30;
 
 function update(timeStamp) {
     let canvas = document.getElementById("maze");
@@ -46,8 +46,12 @@ function update(timeStamp) {
 }
 
 addEventListener("deviceorientation", (event) => {
-    const y = round(event.beta / 180, 2);
-    const z = round(event.gamma / 90, 2);
+    const range = 0.5;
+    const maxY = 180 * range;
+    const maxZ = 90 * range;
+
+    const y = round(clamp(event.beta, -maxY, maxY) / maxY, 2);
+    const z = round(clamp(event.gamma, -maxZ, maxZ) / maxZ, 2);
     
     ball.acceleration.set(z, y);
     stats.innerText = `acceleration.x: ${z}, acceleration.y: ${y}`
