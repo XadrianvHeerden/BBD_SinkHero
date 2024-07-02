@@ -25,10 +25,16 @@ app.get('/games', (req, res) => {
 
 app.get('/host', (req, res) => {
     res.sendFile(path.join(__dirname, './../public', 'host.html'));
+    io.emit('hostAccessed');
 });
 
 io.on('connection', (socket) => {
     console.log('A player connected:', socket.id);
+
+    socket.on('hostAccessed', () => {
+        console.log(`Host accessed by socket: ${socket.id}`);
+        socket.isHost = true;
+    });
 
     socket.on('joinGame', (data) => {
         const { gameId, username } = data;
@@ -89,7 +95,7 @@ io.on('connection', (socket) => {
     const startGame = (gameId) => {
         if (games[gameId].players.length >= 2) {
             games[gameId].status = 'in-progress';
-            games[gameId].currentRound = 1;
+            games[gameId].currentRound = 0;
 
             games[gameId].players.forEach((player, index) => {
                 player.emit('gameStart', { gameId, playerId: index, name: player.name });
@@ -100,6 +106,9 @@ io.on('connection', (socket) => {
 
             // Start the first round
             startRound(gameId);
+        }
+        else{
+            endGame(gameId);
         }
     };
 
@@ -130,22 +139,34 @@ io.on('connection', (socket) => {
     };
 
     socket.on('endRound', (data) => {
+        console.log(data);
+        games[socket.gameId].players.forEach(player => player.emit('getPositions', {  playerId: socket.id  }));
+    });
+
+    socket.on('receivePositions', (data) => {
+        console.log(data);
+
         const game = games[data.gameId];
         const positions = data.positions;
 
         if (positions) {
             positions.forEach((positionData) => {
-                const player = game.players.find(p => p.id === positionData.playerId);
-                player.points += positionData.points;
+                const player = game.players.find(p => p.id === socket.id);
+                if (player) { // Check if player exists
+                    player.points += (4 - positionData.position) * 100;
 
-                // Notify all players of the updated points
-                game.players.forEach(p => {
-                    p.emit('pointsUpdated', { playerId: positionData.playerId, points: player.points });
-                });
+                    // Notify all players of the updated points
+                    game.players.forEach(p => {
+                        
+                    });
+                        p.emit('pointsUpdated', { playerId: positionData.playerId, points: player.points });
+                } else {
+                    console.error(`Player with ID ${positionData.playerId} not found`);
+                }
             });
 
             // Start the next round
-            startRound(data.gameId);
+            // startRound(data.gameId);
         } else {
             console.error('Positions data is missing in endRound event');
         }
