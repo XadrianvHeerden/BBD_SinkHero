@@ -430,9 +430,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on("playerPositionChanged", (data) => {
-        console.log(`playerId: ${data.playerId} is at (${data.x}, ${data.y}).`);
-
-        console.log(hosts);
         hosts.forEach(host => {
             host.emit("playerPositionChangedHost", data);
         })

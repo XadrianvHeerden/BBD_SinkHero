@@ -12,12 +12,16 @@
             const socket = io();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e257591 (positions are now correctly emitted to the host)
             let ball = null;
             let velocity = { x: 0, y: 0 };
             let acceleration = { x: 0, y: 0 };
             const friction = 0.9;
             const ballRadius = 10;
             let lastUpdate = Date.now();
+<<<<<<< HEAD
 
             let canvas = document.getElementById("maze");
             const ctx = canvas.getContext("2d");
@@ -81,49 +85,86 @@
                 ay: 0,
                 vx: 0,
                 vy: 0,
+=======
+>>>>>>> e257591 (positions are now correctly emitted to the host)
 
-                data: null,
-            }
+            let canvas = document.getElementById("maze");
+            const ctx = canvas.getContext("2d");
+
+            // const ball = {
+            //     radius: 10,
+            //     ax: 0,
+            //     ay: 0,
+            //     vx: 0,
+            //     vy: 0,
+
+            //     data: null,
+            // };
 
             const FRAME_RATE = 30;
             let previousTimeStamp = performance.now();
 
-            function update(timeStamp) {
-                if (!ball.data)
-                    return;
+            // Update ball position
+            function updateBallPosition() {
+                // Apply acceleration to velocity
+                velocity.x += acceleration.x;
+                velocity.y += acceleration.y;
 
-                let canvas = document.getElementById("maze");
-                let ctx = canvas.getContext("2d");
+                // Apply friction to velocity
+                velocity.x *= friction;
+                velocity.y *= friction;
 
-                ctx.clearRect(
-                    ball.data.x - ball.radius - 1,
-                    ball.data.y - ball.radius - 1,
-                    (ball.radius + 1) * 2, (ball.radius + 1) * 2);
+                // Update ball position
+                ball.x += velocity.x;
+                ball.y += velocity.y;
 
-                const delta = (timeStamp - previousTimeStamp) / (1000.0 / FRAME_RATE);
-
-                let acceleration = ball.acceleration.getCopy();
-                acceleration.scale(MAX_ACCELARATION);
-
-                ball.data.x += ball.vx * delta;
-                ball.data.y += ball.vy * delta;
-
-                ctx.beginPath();
-                ctx.arc(ball.data.x, ball.data.y, ball.radius, 0, 2 * Math.PI);
-                ctx.fillStyle = ball.data.colour;
-                ctx.fill();
-
-                socket.emit("playerPositionChanged", player.data);
-
-                previousTimeStamp = timeStamp;
-                requestAnimationFrame(update);
+                // Ensure ball stays within canvas boundaries
+                ball.x = Math.max(ballRadius, Math.min(canvas.width - ballRadius, ball.x));
+                ball.y = Math.max(ballRadius, Math.min(canvas.height - ballRadius, ball.y));
             }
 
+<<<<<<< HEAD
 >>>>>>> 694a92a (rebase)
+=======
+            // Draw ball
+            function drawBall() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
+                ctx.fillStyle = ball.colour;
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            // Animation loop
+            function animate() {
+                updateBallPosition();
+                drawBall();
+
+
+                socket.emit("playerPositionChanged", ball);
+                requestAnimationFrame(animate);
+            }
+
+            // Handle gyroscope data
+            window.addEventListener('deviceorientation', (event) => {
+                const now = Date.now();
+
+                if (now - lastUpdate > 16) { // Throttle to ~60fps
+                    // Map gyroscope data to acceleration
+                    acceleration.x = event.gamma / 100; // Adjust the sensitivity
+                    acceleration.y = event.beta / 100;  // Adjust the sensitivity
+
+                    lastUpdate = now;
+                }
+            });
+
+>>>>>>> e257591 (positions are now correctly emitted to the host)
             document.getElementById('joinButton').addEventListener('click', () => {
                 const name = document.getElementById('nameInput').value;
-                if (name) {
-                    socket.emit('setName', { name: name });
+                const gameId = document.getElementById('gameIdInput').value;
+                if (name && gameId) {
+                    socket.emit('joinGame', { username: name, gameId: gameId });
                     document.getElementById('gameInfo').innerHTML = ``;
                 }
             });
@@ -133,18 +174,7 @@
             });
 
             document.getElementById('submitPositionButton').addEventListener('click', () => {
-                const position = document.getElementById('positionInput').value;
-                const gameId = document.getElementById('gameInfo').getAttribute('data-game-id');
-                const playerId = document.getElementById('gameInfo').getAttribute('data-player-id');
-                if (position && gameId && playerId) {
-                    socket.emit('endRound', {
-                        gameId: parseInt(gameId),
-                        playerId: parseInt(playerId),
-                        positions: [ // This array should be provided with all player positions, adjust as needed
-                            { playerId: parseInt(playerId), points: parseInt(position) }
-                        ]
-                    });
-                }
+                socket.emit('endRound', {});
             });
 
             socket.on('waiting', (data) => {
@@ -152,6 +182,8 @@
                 document.getElementById('waitingMessage').style.display = '';
                 document.getElementById('waitingMessage').innerText = `Waiting for more players... (${data.playersCount}/4)`;
                 document.getElementById('startSection').style.display = data.playersCount >= 2 ? 'block' : 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+
             });
 
             socket.on('gameStart', (data) => {
@@ -169,6 +201,7 @@
                 document.getElementById('startSection').style.display = 'none';
                 document.getElementById('waitingMessage').style.display = 'none';
                 document.getElementById('positionSection').style.display = 'block';
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 document.getElementById('errorMessage').style.display = 'none';
@@ -250,6 +283,15 @@
 >>>>>>> 694a92a (rebase)
 =======
 >>>>>>> 532e2c7 (simple position updates between back and front)
+=======
+                document.getElementById('errorMessage').style.display = 'none';
+
+                
+                document.getElementById('maze').style.display = 'block';
+
+                ball = data;
+                requestAnimationFrame(animate);
+>>>>>>> e257591 (positions are now correctly emitted to the host)
             });
 
             socket.on('playerLeft', (data) => {
@@ -257,10 +299,15 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 document.getElementById('errorMessage').style.display = 'none';
 
 =======
 >>>>>>> 532e2c7 (simple position updates between back and front)
+=======
+                document.getElementById('errorMessage').style.display = 'none';
+
+>>>>>>> e257591 (positions are now correctly emitted to the host)
             });
 
             socket.on('gameEnded', (data) => {
@@ -272,6 +319,23 @@
                 document.getElementById('joinSection').style.display = 'block';
                 document.getElementById('startSection').style.display = 'none';
                 document.getElementById('positionSection').style.display = 'none';
+                document.getElementById('waitingMessage').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+            });
+
+            socket.on('getPositions', (data) => {
+                const position = document.getElementById('positionInput').value;
+                const gameId = document.getElementById('gameInfo').getAttribute('data-game-id');
+                const playerId = document.getElementById('gameInfo').getAttribute('data-player-id');
+                if (position && gameId && playerId) {
+                    socket.emit('receivePositions', {
+                        gameId: parseInt(gameId),
+                        playerId: parseInt(playerId),
+                        positions: [ // This array should be provided with all player positions, adjust as needed
+                            { playerId: parseInt(playerId), position: parseInt(position) }
+                        ]
+                    });
+                }
             });
 
             socket.on('pointsUpdated', (data) => {
@@ -281,8 +345,11 @@
                     pointsInfo += `<p>Player ${player.playerId}: ${player.points} points</p>`;
                 });
                 document.getElementById('gameInfo').innerHTML += pointsInfo;
+                document.getElementById('errorMessage').style.display = 'none';
+
             });
 
+<<<<<<< HEAD
             addEventListener("deviceorientation", (event) => {
                 let x = event.alpha;
                 let y = event.beta;
@@ -364,12 +431,17 @@
 
             });
 
+=======
+>>>>>>> e257591 (positions are now correctly emitted to the host)
             socket.on('error', (data) => {
                 console.error(data.message);
                 document.getElementById('errorMessage').innerText = data.message;
             });
+<<<<<<< HEAD
 =======
 >>>>>>> 694a92a (rebase)
+=======
+>>>>>>> e257591 (positions are now correctly emitted to the host)
         });
 
     </script>
@@ -379,6 +451,7 @@
 
     <h1>Multiplayer Game</h1>
     <div id="joinSection">
+        <input type="text" id="gameIdInput" placeholder="Enter game ID">
         <input type="text" id="nameInput" placeholder="Enter your name">
         <button id="joinButton">Join Game</button>
     </div>
@@ -391,6 +464,7 @@
         <button id="submitPositionButton">Submit Position</button>
     </div>
     <div id="gameInfo"></div>
+    <div id="errorMessage" style="color: red;"></div>
     <p>Open this page in multiple tabs to simulate multiple players connecting.</p>
 <<<<<<< HEAD
 <<<<<<< HEAD

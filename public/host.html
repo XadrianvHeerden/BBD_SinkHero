@@ -61,16 +61,30 @@
                     ctx.clearRect(previous_position.x - 11, previous_position.y - 11, 22, 22);
 =======
 
+            let previous_positions = {};
+            let canvas = document.getElementById("maze");
+            let ctx = canvas.getContext("2d");
+
             socket.on("playerPositionChangedHost", (data) => {
+<<<<<<< HEAD
                 let canvas = document.getElementById("maze");
                 let ctx = canvas.getContext("2d");
 >>>>>>> 694a92a (rebase)
+=======
+                let previous_position = previous_positions[data.playerId];
+
+                if (previous_position)
+                    ctx.clearRect(previous_position.x - 11, previous_position.y - 11, 22, 22);
+>>>>>>> e257591 (positions are now correctly emitted to the host)
 
                 ctx.beginPath();
                 ctx.arc(data.x, data.y, 10, 0, 2 * Math.PI);
                 ctx.fillStyle = data.colour;
                 ctx.fill();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e257591 (positions are now correctly emitted to the host)
 
                 previous_positions[data.playerId] = { x: data.x, y: data.y };
             });
