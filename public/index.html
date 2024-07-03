@@ -155,6 +155,8 @@
             });
 
             socket.on('sendMaze', (maze) => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
                 for(let i = 0; i < maze.length; i++) {
                     for(let j = 0; j < maze[i].length; j++) {
                         maze[i][j].show = function() {
