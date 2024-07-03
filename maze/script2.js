@@ -180,29 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
             generatedMaze[0][y].walls.left = true;
             generatedMaze[cols - 1][y].walls.right = true;
         }
-
-        // Randomly choose an entrance side and open the wall
-        const entranceSide = Math.floor(Math.random() * 4);
-        let entranceCell;
-
-        switch (entranceSide) {
-            case 0:
-                entranceCell = generatedMaze[Math.floor(Math.random() * cols)][0];
-                entranceCell.walls.top = false;
-                break;
-            case 1:
-                entranceCell = generatedMaze[cols - 1][Math.floor(Math.random() * rows)];
-                entranceCell.walls.right = false;
-                break;
-            case 2:
-                entranceCell = generatedMaze[Math.floor(Math.random() * cols)][rows - 1];
-                entranceCell.walls.bottom = false;
-                break;
-            case 3:
-                entranceCell = generatedMaze[0][Math.floor(Math.random() * rows)];
-                entranceCell.walls.left = false;
-                break;
-        }
     }
 
     function assignStartingPosition() {
