@@ -81,10 +81,10 @@ io.on('connection', (socket) => {
         const gameId = socket.gameId;
         if (!gameId) return;
 
-        games[gameId].players = games[gameId].players.filter(player => player.id !== socket.id);
+        //games[gameId].players = games[gameId].players.filter(player => player.id !== socket.id);
 
         // Notify all players in the game about the current waiting status
-        games[gameId].players.forEach(player => player.emit('waiting', { playersCount: games[gameId].players.length }));
+        //games[gameId].players.forEach(player => player.emit('waiting', { playersCount: games[gameId].players.length }));
 
         if (games[gameId].players.length <= 1) {
             games[gameId].players.forEach(player => player.emit('gameEnded', { gameId }));
