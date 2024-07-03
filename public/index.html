@@ -18,10 +18,11 @@
             const endRadius = cellSize / 3;
 
             let generatedMaze;
-            let end;
 
             const cols = Math.floor(canvas.width / cellSize);
             const rows = Math.floor(canvas.height / cellSize);
+
+            let end = { x: canvas.width / 2, y: (rows * cellSize + cellSize) / 2 };
 
             let player = null;
             let velocity = { x: 0, y: 0 };
@@ -95,10 +96,10 @@
         player.x = newX;
         player.y = newY;
 
-        // if (Math.abs(player.x - end.x) <= 0.2 && Math.abs(player.y - end.y) <= 0.2) {
-        //     alert("Congratulations! You've reached the end!");
-        //     // resetPlayerPos();
-        // }
+        if (Math.abs((player.x * cellSize) - end.x) <= endRadius && Math.abs((player.y * cellSize) - end.y) <= endRadius) {
+            socket.emit('declareWinner', player);
+            // resetPlayerPos();
+        }
     }
             let prev;
 
@@ -115,6 +116,12 @@
 
                 const ballPosX = player.x * cellSize;// + cellSize;// + offsetX;
                 const ballPosY = player.y * cellSize;// + cellSize;// + offsetY;
+
+                ctx.beginPath();
+                ctx.arc(end.x, end.y, endRadius, 0, Math.PI * 2);
+                ctx.fillStyle = 'gold';
+                ctx.fill();
+                ctx.closePath();
 
                 ctx.beginPath();
                 ctx.arc(ballPosX, ballPosY, ballRadius, 0, Math.PI * 2);
@@ -156,6 +163,10 @@
 
             document.getElementById('submitPositionButton').addEventListener('click', () => {
                 socket.emit('endRound', {});
+            });
+
+            socket.on('showWinner', (winner) => {
+                alert(`The winner is ${winner}`);
             });
 
             let previous_positions = {};

@@ -207,6 +207,17 @@ io.on('connection', (socket) => {
             host.emit("playerPositionChangedHost", data);
         })
     });
+
+    socket.on('declareWinner', (data) => {
+        let game = games[socket.gameId];
+
+        if (!game)
+            return;
+
+        game.players.concat(hosts).forEach(player => {
+            player.emit('showWinner', data.name);
+        });
+    })
 });
 
 server.listen(3000, () => {
