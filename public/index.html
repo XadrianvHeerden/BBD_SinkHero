@@ -133,8 +133,8 @@
             // Handle gyroscope data
             window.addEventListener('deviceorientation', (event) => {
                 // Map gyroscope data to acceleration
-                acceleration.x = event.gamma / 100; // Adjust the sensitivity
-                acceleration.y = event.beta / 100;  // Adjust the sensitivity
+                acceleration.x = event.gamma / 45; // Adjust the sensitivity
+                acceleration.y = event.beta / 90;  // Adjust the sensitivity
             });
 
             document.getElementById('joinButton').addEventListener('click', () => {
