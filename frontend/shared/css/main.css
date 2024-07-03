@@ -15,8 +15,6 @@
     max-width: 70%;
     background-color: #b5eaff;
 }
-
-
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f0f0;
@@ -51,20 +49,7 @@ button {
 }
 .button:hover {
     background-color: #0056b3;
-<<<<<<< HEAD
-<<<<<<< HEAD
-}#maze {
-    border: 1px solid black;
-=======
-=======
-#maze {
-    border: 1px solid black;
->>>>>>> 53947d2 (multiplayer tests)
->>>>>>> 694a92a (rebase)
-=======
 }
-
 #maze {
     border: 1px solid black;
->>>>>>> e257591 (positions are now correctly emitted to the host)
 }

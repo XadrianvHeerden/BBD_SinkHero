@@ -18,7 +18,6 @@ function GenerateMaze  (width, height)  {
                 left: true
             };
         }
-
     }
 
     function mazeGenerator(cols, rows) {
