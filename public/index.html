@@ -50,6 +50,8 @@
 
             // Draw ball
             function drawBall() {
+                let canvas = document.getElementById("ball");
+                const ctx = canvas.getContext("2d");
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.beginPath();
                 ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
@@ -62,7 +64,6 @@
             function animate() {
                 updateBallPosition();
                 drawBall();
-
 
                 socket.emit("playerPositionChanged", ball);
                 requestAnimationFrame(animate);
@@ -180,6 +181,41 @@
                 socket.emit('endRound', {});
             });
 
+            socket.on('sendMaze', (maze) => {
+                for(let i = 0; i < maze.length; i++) {
+                    for(let j = 0; j < maze[i].length; j++) {
+                        maze[i][j].show = function() {
+                            const cellSize = this.cellSize;
+                            const x = this.x * cellSize;
+                            const y = this.y * cellSize;
+
+                            ctx.beginPath();
+                            if (this.walls.top) {
+                                ctx.moveTo(x, y);
+                                ctx.lineTo(x + cellSize, y);
+                            }
+                            if (this.walls.right) {
+                                ctx.moveTo(x + cellSize, y);
+                                ctx.lineTo(x + cellSize, y + cellSize);
+                            }
+                            if (this.walls.bottom) {
+                                ctx.moveTo(x + cellSize, y + cellSize);
+                                ctx.lineTo(x, y + cellSize);
+                            }
+                            if (this.walls.left) {
+                                ctx.moveTo(x, y + cellSize);
+                                ctx.lineTo(x, y);
+                            }
+                            ctx.strokeStyle = 'green';
+                            ctx.lineWidth = 5;
+                            ctx.lineCap = "round";
+                            ctx.stroke();
+                        }
+                        maze[i][j].show();
+                    }
+                }
+            });
+
             socket.on('waiting', (data) => {
                 document.getElementById('joinSection').style.display = 'none';
                 document.getElementById('waitingMessage').style.display = '';
@@ -291,6 +327,7 @@
 
                 
                 document.getElementById('maze').style.display = 'block';
+                document.getElementById('ball').style.display = 'block';
 
                 ball = data;
                 requestAnimationFrame(animate);
@@ -367,7 +404,8 @@
     </script>
 </head>
 <body>
-    <canvas id="maze" style="display: none; border: 1px solid black" width="500" height="500"></canvas>
+    <canvas class="canvas" id="ball" width="780" height="600" style="display: none"></canvas>
+    <canvas class="canvas" id="maze" style="display: none; border: 1px solid black" width="780" height="600"></canvas>
 
     <div id="popup" class="container">
     <h1>Sink Hero</h1>

@@ -1,3 +1,5 @@
+const mazeGen = require('./maze_generation');
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -18,7 +20,6 @@ const io = socketIo(server);
 <<<<<<< HEAD
 <<<<<<< HEAD
 let hosts = [];
-let players = [];
 let games = [];
 
 app.use(express.static(path.join(__dirname, '../public')));
@@ -189,6 +190,12 @@ io.on('connection', (socket) => {
 >>>>>>> 2ef70e2 (Basic backend to connect to server)
 
     socket.on('startGame', () => {
+        let generatedMaze = mazeGen.GenerateMaze(780, 600);
+
+        games[socket.gameId].players.concat(hosts).forEach(player => {
+            player.emit('sendMaze', generatedMaze);
+        });
+
         startGame(socket.gameId);
     });
 

@@ -58,7 +58,45 @@
             let canvas = document.getElementById("maze");
             let ctx = canvas.getContext("2d");
 
+            socket.on('sendMaze', (maze) => {
+                for(let i = 0; i < maze.length; i++) {
+                    for(let j = 0; j < maze[i].length; j++) {
+                        maze[i][j].show = function() {
+                            const cellSize = this.cellSize;
+                            const x = this.x * cellSize;
+                            const y = this.y * cellSize;
+
+                            ctx.beginPath();
+                            if (this.walls.top) {
+                                ctx.moveTo(x, y);
+                                ctx.lineTo(x + cellSize, y);
+                            }
+                            if (this.walls.right) {
+                                ctx.moveTo(x + cellSize, y);
+                                ctx.lineTo(x + cellSize, y + cellSize);
+                            }
+                            if (this.walls.bottom) {
+                                ctx.moveTo(x + cellSize, y + cellSize);
+                                ctx.lineTo(x, y + cellSize);
+                            }
+                            if (this.walls.left) {
+                                ctx.moveTo(x, y + cellSize);
+                                ctx.lineTo(x, y);
+                            }
+                            ctx.strokeStyle = 'green';
+                            ctx.lineWidth = 5;
+                            ctx.lineCap = "round";
+                            ctx.stroke();
+                        }
+                        maze[i][j].show();
+                    }
+                }
+            });
+
             socket.on("playerPositionChangedHost", (data) => {
+                let canvas = document.getElementById("ball");
+                let ctx = canvas.getContext("2d");
+
                 let previous_position = previous_positions[data.playerId];
 
                 if (previous_position)
@@ -103,7 +141,12 @@
 <body>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     <canvas id="maze" style="border: 1px solid black" width="500" height="500"></canvas>
+=======
+    <canvas class="canvas" id="maze" style="border: 1px solid black" width="780" height="600"></canvas>
+    <canvas class="canvas" id="ball" width="780" height="600" style="display: none"></canvas>
+>>>>>>> 3b798dd (mazes are now emitted to host and players)
 
 =======
 >>>>>>> 8780c10 (added files)

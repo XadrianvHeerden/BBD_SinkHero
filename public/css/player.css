@@ -49,3 +49,17 @@ h1 {
 .button:hover {
     background-color: #0056b3;
 }
+
+.canvas {
+    position: absolute;
+    top: calc(50% - 600);
+    left: calc(50% - 780);
+}
+
+#ball {
+    z-index: 1;
+}
+
+#maze {
+    z-index: 2;
+}
