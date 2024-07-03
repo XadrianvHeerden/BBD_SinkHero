@@ -9,42 +9,114 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             const socket = io();
-
-            let ball = null;
-            let velocity = { x: 0, y: 0 };
-            let acceleration = { x: 0, y: 0 };
-            const friction = 0.9;
-            const ballRadius = 10;
-            let lastUpdate = Date.now();
-
+            
             let canvas = document.getElementById("maze");
             const ctx = canvas.getContext("2d");
 
-            // Update ball position
-            function updateBallPosition() {
-                // Apply acceleration to velocity
-                velocity.x += acceleration.x;
-                velocity.y += acceleration.y;
+            const cellSize = 60;
+            const ballRadius = cellSize / 6;
+            const endRadius = cellSize / 3;
 
-                // Apply friction to velocity
-                velocity.x *= friction;
-                velocity.y *= friction;
+            let generatedMaze;
+            let end;
 
-                // Update ball position
-                ball.x += velocity.x;
-                ball.y += velocity.y;
+            const cols = Math.floor(canvas.width / cellSize);
+            const rows = Math.floor(canvas.height / cellSize);
 
-                // Ensure ball stays within canvas boundaries
-                ball.x = Math.max(ballRadius, Math.min(canvas.width - ballRadius, ball.x));
-                ball.y = Math.max(ballRadius, Math.min(canvas.height - ballRadius, ball.y));
+            let player = null;
+            let velocity = { x: 0, y: 0 };
+            let acceleration = { x: 0, y: 0 };
+            const friction = 0.9;
+            let lastUpdate = Date.now();
+
+    function checkCollisions(newX, newY) {
+        // Convert the new position to cell coordinates
+        const cellX = Math.floor(newX);
+        const cellY = Math.floor(newY);
+
+        // Ensure the new coordinates are within the maze bounds
+        if (newX < 0 || newX >= cols || newY < 0 || newY >= rows) {
+            return { newX: player.x, newY: player.y };
+        }
+
+        // Check if moving right into a wall
+        if (velocity.x > 0) {
+            if (generatedMaze[cellX][cellY].walls.right && (newX + ballRadius / cellSize) > (cellX + 1)) {
+                newX = cellX + 1 - ballRadius / cellSize;
+                velocity.x = 0;
             }
+        }
+
+        // Check if moving left into a wall
+        if (velocity.x < 0) {
+            if (generatedMaze[cellX][cellY].walls.left && (newX - ballRadius / cellSize) < cellX) {
+                newX = cellX + ballRadius / cellSize;
+                velocity.x = 0;
+            }
+        }
+
+        // Check if moving down into a wall
+        if (velocity.y > 0) {
+            if (generatedMaze[cellX][cellY].walls.bottom && (newY + ballRadius / cellSize) > (cellY + 1)) {
+                newY = cellY + 1 - ballRadius / cellSize;
+                velocity.y = 0;
+            }
+        }
+
+        // Check if moving up into a wall
+        if (velocity.y < 0) {
+            if (generatedMaze[cellX][cellY].walls.top && (newY - ballRadius / cellSize) < cellY) {
+                newY = cellY + ballRadius / cellSize;
+                velocity.y = 0;
+            }
+        }
+
+        return { newX, newY };
+    }
+
+    function updateBallPosition() {
+        const now = Date.now();
+        const deltaTime = (now - lastUpdate) / 1000; // Time in seconds
+        lastUpdate = now;
+
+        velocity.x += acceleration.x * deltaTime;
+        velocity.y += acceleration.y * deltaTime;
+
+        velocity.x *= friction;
+        velocity.y *= friction;
+
+        let newX = player.x + velocity.x;
+        let newY = player.y + velocity.y;
+
+        const correctedPosition = checkCollisions(newX, newY);
+        newX = correctedPosition.newX;
+        newY = correctedPosition.newY;
+
+        player.x = newX;
+        player.y = newY;
+
+        // if (Math.abs(player.x - end.x) <= 0.2 && Math.abs(player.y - end.y) <= 0.2) {
+        //     alert("Congratulations! You've reached the end!");
+        //     // resetPlayerPos();
+        // }
+    }
 
             // Draw ball
             function drawBall() {
+                let canvas = document.getElementById("ball");
+                const ctx = canvas.getContext("2d");
+
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // const offsetX = (canvas.width - cols * cellSize) / 2;
+                // const offsetY = (canvas.height - rows * cellSize) / 2;
+
+                const ballPosX = player.x * cellSize;// + cellSize;// + offsetX;
+                const ballPosY = player.y * cellSize;// + cellSize;// + offsetY;
+
                 ctx.beginPath();
-                ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
-                ctx.fillStyle = ball.colour;
+                ctx.arc(ballPosX, ballPosY, ballRadius, 0, Math.PI * 2);
+                ctx.fillStyle = player.colour;
                 ctx.fill();
                 ctx.closePath();
             }
@@ -54,8 +126,7 @@
                 updateBallPosition();
                 drawBall();
 
-
-                socket.emit("playerPositionChanged", ball);
+                socket.emit("playerPositionChanged", player);
                 requestAnimationFrame(animate);
             }
 
@@ -89,6 +160,46 @@
                 socket.emit('endRound', {});
             });
 
+            socket.on('sendMaze', (maze) => {
+                for(let i = 0; i < maze.length; i++) {
+                    for(let j = 0; j < maze[i].length; j++) {
+                        maze[i][j].show = function() {
+                            const cellSize = this.cellSize;
+
+                            // const offsetX = (canvas.width - cols * cellSize) + cellSize;
+                            // const offsetY = (canvas.height - rows * cellSize) + cellSize;
+
+                            const x = this.x * cellSize;// + offsetX;
+                            const y = this.y * cellSize;// + offsetY;
+
+                            ctx.beginPath();
+                            if (this.walls.top) {
+                                ctx.moveTo(x, y);
+                                ctx.lineTo(x + cellSize, y);
+                            }
+                            if (this.walls.right) {
+                                ctx.moveTo(x + cellSize, y);
+                                ctx.lineTo(x + cellSize, y + cellSize);
+                            }
+                            if (this.walls.bottom) {
+                                ctx.moveTo(x + cellSize, y + cellSize);
+                                ctx.lineTo(x, y + cellSize);
+                            }
+                            if (this.walls.left) {
+                                ctx.moveTo(x, y + cellSize);
+                                ctx.lineTo(x, y);
+                            }
+                            ctx.strokeStyle = 'green';
+                            ctx.lineWidth = 5;
+                            ctx.lineCap = "round";
+                            ctx.stroke();
+                        }
+                        maze[i][j].show();
+                    }
+                }
+                generatedMaze = maze;
+            });
+
             socket.on('waiting', (data) => {
                 document.getElementById('joinSection').style.display = 'none';
                 document.getElementById('waitingMessage').style.display = '';
@@ -117,8 +228,9 @@
 
                 
                 document.getElementById('maze').style.display = 'block';
+                document.getElementById('ball').style.display = 'block';
 
-                ball = data;
+                player = data;
                 requestAnimationFrame(animate);
             });
 
@@ -171,21 +283,13 @@
                 console.error(data.message);
                 document.getElementById('errorMessage').innerText = data.message;
             });
-
-            addEventListener("deviceorientation", (event) => {
-                let x = event.alpha;
-                let y = event.beta;
-                let z = event.gamma;
-
-                ball.vx = y ? y : 1;
-                ball.vy = z ? z : 1;
-            });        
         });
 
     </script>
 </head>
 <body>
-    <canvas id="maze" style="display: none; border: 1px solid black" width="500" height="500"></canvas>
+    <canvas class="canvas" id="maze" style="display: none; border: 1px solid black" width="780" height="600"></canvas>
+    <canvas class="canvas" id="ball" style="display: none; border: 1px solid black" width="780" height="600"></canvas>
 
     <div id="popup" class="container">
     <h1>Sink Hero</h1>

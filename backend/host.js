@@ -1,3 +1,5 @@
+const mazeGen = require('./maze_generation');
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -8,7 +10,6 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 let hosts = [];
-let players = [];
 let games = [];
 
 app.use(express.static(path.join(__dirname, '../public')));
@@ -29,6 +30,7 @@ app.get('/games', (req, res) => {
 
 app.get('/host', (req, res) => {
     res.sendFile(path.join(__dirname, './../public', 'host.html'));
+    io.emit('hostAccessed');
 });
 
 io.on('connection', (socket) => {
@@ -72,6 +74,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('startGame', () => {
+        let generatedMaze = mazeGen.GenerateMaze(780, 600);
+
+        games[socket.gameId].players.concat(hosts).forEach(player => {
+            player.emit('sendMaze', generatedMaze);
+        });
+
         startGame(socket.gameId);
     });
 
@@ -81,10 +89,10 @@ io.on('connection', (socket) => {
         const gameId = socket.gameId;
         if (!gameId) return;
 
-        //games[gameId].players = games[gameId].players.filter(player => player.id !== socket.id);
+        // games[gameId].players = games[gameId].players.filter(player => player.id !== socket.id);
 
         // Notify all players in the game about the current waiting status
-        //games[gameId].players.forEach(player => player.emit('waiting', { playersCount: games[gameId].players.length }));
+        games[gameId].players.forEach(player => player.emit('waiting', { playersCount: games[gameId].players.length }));
 
         if (games[gameId].players.length <= 1) {
             games[gameId].players.forEach(player => player.emit('gameEnded', { gameId }));
