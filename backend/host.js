@@ -10,9 +10,6 @@ const io = socketIo(server);
 let hosts = [];
 let players = [];
 let games = [];
-let hosts = [];
-let players = [];
-let games = [];
 
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -32,7 +29,6 @@ app.get('/games', (req, res) => {
 
 app.get('/host', (req, res) => {
     res.sendFile(path.join(__dirname, './../public', 'host.html'));
-    io.emit('hostAccessed');
 });
 
 io.on('connection', (socket) => {
