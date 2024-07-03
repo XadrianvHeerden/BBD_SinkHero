@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
         player.x = newX;
         player.y = newY;
 
-        if (Math.abs(player.x - end.x) <= 0.2 && Math.abs(player.y - end.y) <= 0.2) {
+        if (Math.abs(player.x - end.x) <= 0.1 && Math.abs(player.y - end.y) <= 0.1) {
             alert("Congratulations! You've reached the end!");
             // resetPlayerPos();
         }
