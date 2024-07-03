@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Multiplayer Game</title>
+    <link rel="stylesheet" href="css/player.css">
     <script src="/socket.io/socket.io.js"></script>
     <script>
 
@@ -18,19 +19,6 @@
 
             let canvas = document.getElementById("maze");
             const ctx = canvas.getContext("2d");
-
-            // const ball = {
-            //     radius: 10,
-            //     ax: 0,
-            //     ay: 0,
-            //     vx: 0,
-            //     vy: 0,
-
-            //     data: null,
-            // };
-
-            const FRAME_RATE = 30;
-            let previousTimeStamp = performance.now();
 
             // Update ball position
             function updateBallPosition() {
@@ -117,6 +105,8 @@
                     <p>Game ID: ${data.gameId}</p>
                     <p>You are Player ${data.playerId} (Name: ${data.name})</p>
                 `;
+
+                document.getElementById('popup').style.display = 'none';
                 document.getElementById('gameInfo').setAttribute('data-game-id', data.gameId);
                 document.getElementById('gameInfo').setAttribute('data-player-id', data.playerId);
                 document.getElementById('joinSection').style.display = 'none';
@@ -188,7 +178,8 @@
 <body>
     <canvas id="maze" style="display: none; border: 1px solid black" width="500" height="500"></canvas>
 
-    <h1>Multiplayer Game</h1>
+    <div id="popup" class="container">
+    <h1>Sink Hero</h1>
     <div id="joinSection">
         <input type="text" id="gameIdInput" placeholder="Enter game ID">
         <input type="text" id="nameInput" placeholder="Enter your name">
@@ -205,5 +196,6 @@
     <div id="gameInfo"></div>
     <div id="errorMessage" style="color: red;"></div>
     <p>Open this page in multiple tabs to simulate multiple players connecting.</p>
+    </div>
 </body>
 </html>
