@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/BBD_SinkHero/frontend/shared/css/main.css">
+    <title>Sink Hero</title>
+    <style>
+        /* Basic styles */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            background: #e0f7fa;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Navigation bar styles */
+        nav {
+            width: 100%;
+            background-color: #0288d1;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        nav .game-title {
+            font-size: 24px;
+            font-weight: bold;
+            padding: 14px 20px;
+            color: #ffffff; /* White color */
+        }
+
+        /* Main container styles */
+        #mainContainer {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            flex-grow: 1;
+            width: 100%;
+            padding: 20px;
+        }
+
+        /* Game canvas styles */
+        #gameContainer {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 800px;
+        }
+
+        #gameCanvas {
+            border: 1px solid #000;
+            background: #fff;
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            position: relative;
+        }
+
+        /* Game info styles */
+        .game-info {
+            margin-left: 20px;
+            width: 300px;
+            background-color: #ffffff;
+            border: 1px solid #0288d1;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-info h3 {
+            margin: 0 0 10px 0;
+            color: #0288d1;
+            text-align: center;
+        }
+
+        .scoreboard {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .scoreboard div {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #e0f7fa;
+            border-radius: 5px;
+        }
+
+        .scoreboard div:nth-child(odd) {
+            background-color: #b3e5fc;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            nav .game-title {
+                padding: 10px 15px;
+            }
+
+            #mainContainer {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            #gameCanvas {
+                width: 90%;
+            }
+
+            .game-info {
+                width: 90%;
+                margin-left: 0;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="game-title">Sink Hero</div>
+    </nav>
+    <div id="mainContainer">
+        <div id="gameContainer">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+        </div>
+        <div class="game-info">
+            <h3>Game Information</h3>
+            <div>Round: <span id="round">1</span></div>
+            <div>Time: <span id="time">00:00</span></div>
+            <div class="scoreboard">
+                <h3>Scoreboard</h3>
+                <div>
+                    <span>Username: <span id="user1">Player1</span></span>
+                    <span>Score: <span id="score1">0</span></span>
+                </div>
+                <div>
+                    <span>Username: <span id="user2">Player2</span></span>
+                    <span>Score: <span id="score2">0</span></span>
+                </div>
+                <!-- Additional players can be added similarly -->
+            </div>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game.js"></script>
+    <script>
+        // Example JavaScript to update the game info dynamically
+        let score = 0;
+        let round = 1;
+        let time = 0;
+
+        const updateTime = () => {
+            time++;
+            const minutes = Math.floor(time / 60).toString().padStart(2, '0');
+            const seconds = (time % 60).toString().padStart(2, '0');
+            document.getElementById('time').innerText = `${minutes}:${seconds}`;
+        };
+
+        setInterval(updateTime, 1000);
+
+        // Example function to update the score and round
+        const updateScore = (playerId, newScore) => {
+            document.getElementById(`score${playerId}`).innerText = newScore;
+        };
+
+        const updateRound = (newRound) => {
+            round = newRound;
+            document.getElementById('round').innerText = round;
+        };
+
+        // For testing purposes, increment score and round every 10 seconds
+        setInterval(() => {
+            updateScore(1, score + 10);
+            updateScore(2, score + 20);
+            updateRound(round + 1);
+        }, 10000);
+    </script>
+</body>
+
+</html>

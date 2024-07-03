@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multiplayer Game</title>
+    <link rel="stylesheet" href="css/player.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const socket = io();
+
+            let ball = null;
+            let velocity = { x: 0, y: 0 };
+            let acceleration = { x: 0, y: 0 };
+            const friction = 0.9;
+            const ballRadius = 10;
+            let lastUpdate = Date.now();
+
+            let canvas = document.getElementById("maze");
+            const ctx = canvas.getContext("2d");
+
+            // Update ball position
+            function updateBallPosition() {
+                // Apply acceleration to velocity
+                velocity.x += acceleration.x;
+                velocity.y += acceleration.y;
+
+                // Apply friction to velocity
+                velocity.x *= friction;
+                velocity.y *= friction;
+
+                // Update ball position
+                ball.x += velocity.x;
+                ball.y += velocity.y;
+
+                // Ensure ball stays within canvas boundaries
+                ball.x = Math.max(ballRadius, Math.min(canvas.width - ballRadius, ball.x));
+                ball.y = Math.max(ballRadius, Math.min(canvas.height - ballRadius, ball.y));
+            }
+
+            // Draw ball
+            function drawBall() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
+                ctx.fillStyle = ball.colour;
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            // Animation loop
+            function animate() {
+                updateBallPosition();
+                drawBall();
+
+
+                socket.emit("playerPositionChanged", ball);
+                requestAnimationFrame(animate);
+            }
+
+            // Handle gyroscope data
+            window.addEventListener('deviceorientation', (event) => {
+                const now = Date.now();
+
+                if (now - lastUpdate > 16) { // Throttle to ~60fps
+                    // Map gyroscope data to acceleration
+                    acceleration.x = event.gamma / 100; // Adjust the sensitivity
+                    acceleration.y = event.beta / 100;  // Adjust the sensitivity
+
+                    lastUpdate = now;
+                }
+            });
+
+            document.getElementById('joinButton').addEventListener('click', () => {
+                const name = document.getElementById('nameInput').value;
+                const gameId = document.getElementById('gameIdInput').value;
+                if (name && gameId) {
+                    socket.emit('joinGame', { username: name, gameId: gameId });
+                    document.getElementById('gameInfo').innerHTML = ``;
+                }
+            });
+
+            document.getElementById('startButton').addEventListener('click', () => {
+                socket.emit('startGame');
+            });
+
+            document.getElementById('submitPositionButton').addEventListener('click', () => {
+                socket.emit('endRound', {});
+            });
+
+            socket.on('waiting', (data) => {
+                document.getElementById('joinSection').style.display = 'none';
+                document.getElementById('waitingMessage').style.display = '';
+                document.getElementById('waitingMessage').innerText = `Waiting for more players... (${data.playersCount}/4)`;
+                document.getElementById('startSection').style.display = data.playersCount >= 2 ? 'block' : 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+
+            });
+
+            socket.on('gameStart', (data) => {
+                console.log(`Game ${data.gameId} started. You are player ${data.playerId} (Name: ${data.name})`);
+                document.getElementById('gameInfo').innerHTML = `
+                    <h2>Game Started!</h2>
+                    <p>Game ID: ${data.gameId}</p>
+                    <p>You are Player ${data.playerId} (Name: ${data.name})</p>
+                `;
+
+                document.getElementById('popup').style.display = 'none';
+                document.getElementById('gameInfo').setAttribute('data-game-id', data.gameId);
+                document.getElementById('gameInfo').setAttribute('data-player-id', data.playerId);
+                document.getElementById('joinSection').style.display = 'none';
+                document.getElementById('startSection').style.display = 'none';
+                document.getElementById('waitingMessage').style.display = 'none';
+                document.getElementById('positionSection').style.display = 'block';
+                document.getElementById('errorMessage').style.display = 'none';
+
+                
+                document.getElementById('maze').style.display = 'block';
+
+                ball = data;
+                requestAnimationFrame(animate);
+            });
+
+            socket.on('playerLeft', (data) => {
+                console.log(`Player ${data.playerId} left the game`);
+                document.getElementById('errorMessage').style.display = 'none';
+
+            });
+
+            socket.on('gameEnded', (data) => {
+                console.log(`Game ${data.gameId} ended due to insufficient players.`);
+                document.getElementById('gameInfo').innerHTML = `
+                    <h2>Game Ended</h2>
+                    <p>Game ID: ${data.gameId} ended due to insufficient players.</p>
+                `;
+                document.getElementById('joinSection').style.display = 'block';
+                document.getElementById('startSection').style.display = 'none';
+                document.getElementById('positionSection').style.display = 'none';
+                document.getElementById('waitingMessage').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'none';
+            });
+
+            socket.on('getPositions', (data) => {
+                const position = document.getElementById('positionInput').value;
+                const gameId = document.getElementById('gameInfo').getAttribute('data-game-id');
+                const playerId = document.getElementById('gameInfo').getAttribute('data-player-id');
+                if (position && gameId && playerId) {
+                    socket.emit('receivePositions', {
+                        gameId: parseInt(gameId),
+                        playerId: parseInt(playerId),
+                        positions: [ // This array should be provided with all player positions, adjust as needed
+                            { playerId: parseInt(playerId), position: parseInt(position) }
+                        ]
+                    });
+                }
+            });
+
+            socket.on('pointsUpdated', (data) => {
+                console.log('Points updated', data);
+                let pointsInfo = '';
+                data.players.forEach(player => {
+                    pointsInfo += `<p>Player ${player.playerId}: ${player.points} points</p>`;
+                });
+                document.getElementById('gameInfo').innerHTML += pointsInfo;
+                document.getElementById('errorMessage').style.display = 'none';
+
+            });
+
+            socket.on('error', (data) => {
+                console.error(data.message);
+                document.getElementById('errorMessage').innerText = data.message;
+            });
+
+            addEventListener("deviceorientation", (event) => {
+                let x = event.alpha;
+                let y = event.beta;
+                let z = event.gamma;
+
+                ball.vx = y ? y : 1;
+                ball.vy = z ? z : 1;
+            });        
+        });
+
+    </script>
+</head>
+<body>
+    <canvas id="maze" style="display: none; border: 1px solid black" width="500" height="500"></canvas>
+
+    <div id="popup" class="container">
+    <h1>Sink Hero</h1>
+    <div id="joinSection">
+        <input type="text" id="gameIdInput" placeholder="Enter game ID">
+        <input type="text" id="nameInput" placeholder="Enter your name">
+        <button id="joinButton">Join Game</button>
+    </div>
+    <div id="waitingMessage"></div>
+    <div id="startSection" style="display: none;">
+        <button id="startButton">Start Game</button>
+    </div>
+    <div id="positionSection" style="display: none;">
+        <input type="number" id="positionInput" placeholder="Enter your position (1-4)">
+        <button id="submitPositionButton">Submit Position</button>
+    </div>
+    <div id="gameInfo"></div>
+    <div id="errorMessage" style="color: red;"></div>
+    <p>Open this page in multiple tabs to simulate multiple players connecting.</p>
+    </div>
+</body>
+</html>

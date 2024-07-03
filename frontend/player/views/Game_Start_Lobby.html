@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waiting Lobby</title>
+    <link rel="stylesheet" href="/BBD_SinkHero/frontend/shared/css/main.css"> <!-- Link to external stylesheet -->
+</head>
+<body>
+    <div class="lobby-container">
+        <h1>Waiting Lobby</h1>
+
+        <!-- Game Room Name -->
+        <div class="game-room">
+            <p>Game Room: <span id="gameRoomName"></span></p>
+        </div>
+
+        <!-- Player List Table -->
+        <div class="player-list">
+            <h2>Players in the Game</h2>
+            <table id="playerTable">
+                <thead>
+                    <tr>
+                        <th>Player Id</th>
+                    </tr>
+                </thead>
+                <tbody id="playerList">
+                    <tr>
+                        <td>Test Player</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Start Game Button -->
+        <div class="start-game">
+            <button  class="button" onclick="ExitGame()">Exit</button>
+            <button class="button" id="startGameButton" onclick="startGame()">Start Game</button>
+        </div>
+    </div>
+
+    <!-- Script for WebSocket handling (waiting.js) -->
+    <script src="waiting.js"></script>
+</body>
+</html>
