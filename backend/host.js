@@ -23,6 +23,7 @@ let games = [];
 
 app.use(express.static(path.join(__dirname, '../public')));
 
+<<<<<<< HEAD
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './../public', 'index.html'));
 });
@@ -96,6 +97,8 @@ let players = [];
 let games = [];
 >>>>>>> 694a92a (rebase)
 
+=======
+>>>>>>> f2cb751 (added styling)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './../public', 'index.html'));
 });
