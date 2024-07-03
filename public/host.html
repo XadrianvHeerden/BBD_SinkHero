@@ -77,11 +77,11 @@
                     ctx.clearRect(previous_position.x - 11, previous_position.y - 11, 22, 22);
 
                 ctx.beginPath();
-                ctx.arc(data.x, data.y, 10, 0, 2 * Math.PI);
+                ctx.arc(data.x * 60, data.y * 60, 10, 0, 2 * Math.PI);
                 ctx.fillStyle = data.colour;
                 ctx.fill();
 
-                previous_positions[data.playerId] = { x: data.x, y: data.y };
+                previous_positions[data.playerId] = { x: data.x * 60, y: data.y * 60 };
             });
         });
     </script>
@@ -90,10 +90,12 @@
     <canvas class="canvas" id="maze" style="border: 1px solid black" width="780" height="600"></canvas>
     <canvas class="canvas" id="ball" width="780" height="600"></canvas>
 
-    <h1>Multiplayer Host</h1>
-    <div id="hostSection">
-        <button id="listGamesButton">List Games</button>
-        <div id="gamesList"></div>
+    <div style="display: none;">
+        <h1>Multiplayer Host</h1>
+        <div id="hostSection">
+            <button id="listGamesButton">List Games</button>
+            <div id="gamesList"></div>
+        </div>
     </div>
 </body>
 </html>
