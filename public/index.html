@@ -132,15 +132,9 @@
 
             // Handle gyroscope data
             window.addEventListener('deviceorientation', (event) => {
-                const now = Date.now();
-
-                if (now - lastUpdate > 16) { // Throttle to ~60fps
-                    // Map gyroscope data to acceleration
-                    acceleration.x = event.gamma / 100; // Adjust the sensitivity
-                    acceleration.y = event.beta / 100;  // Adjust the sensitivity
-
-                    lastUpdate = now;
-                }
+                // Map gyroscope data to acceleration
+                acceleration.x = event.gamma / 100; // Adjust the sensitivity
+                acceleration.y = event.beta / 100;  // Adjust the sensitivity
             });
 
             document.getElementById('joinButton').addEventListener('click', () => {
