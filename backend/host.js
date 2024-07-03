@@ -192,6 +192,17 @@ io.on('connection', (socket) => {
     });
 
     socket.on("playerPositionChanged", (data) => {
+        const game = games[data.gameId]; 
+
+        if (!game)
+            return;
+
+        game.players.forEach(player => {
+            if (player != socket) {
+                player.emit("playerPositionChangedHost", data);
+            }
+        });
+
         hosts.forEach(host => {
             host.emit("playerPositionChangedHost", data);
         })

@@ -100,13 +100,15 @@
         //     // resetPlayerPos();
         // }
     }
+            let prev;
 
             // Draw ball
             function drawBall() {
                 let canvas = document.getElementById("ball");
                 const ctx = canvas.getContext("2d");
 
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (prev)
+                    ctx.clearRect(prev.x - 11, prev.y - 11, 22, 22);
 
                 // const offsetX = (canvas.width - cols * cellSize) / 2;
                 // const offsetY = (canvas.height - rows * cellSize) / 2;
@@ -119,6 +121,8 @@
                 ctx.fillStyle = player.colour;
                 ctx.fill();
                 ctx.closePath();
+
+                prev = {x: ballPosX, y: ballPosY};
             }
 
             // Animation loop
@@ -152,6 +156,25 @@
 
             document.getElementById('submitPositionButton').addEventListener('click', () => {
                 socket.emit('endRound', {});
+            });
+
+            let previous_positions = {};
+
+            socket.on("playerPositionChangedHost", (data) => {
+                let canvas = document.getElementById("ball");
+                let ctx = canvas.getContext("2d");
+
+                let previous_position = previous_positions[data.playerId];
+
+                if (previous_position)
+                    ctx.clearRect(previous_position.x - 11, previous_position.y - 11, 22, 22);
+
+                ctx.beginPath();
+                ctx.arc(data.x * 60, data.y * 60, 10, 0, 2 * Math.PI);
+                ctx.fillStyle = data.colour;
+                ctx.fill();
+
+                previous_positions[data.playerId] = { x: data.x * 60, y: data.y * 60 };
             });
 
             socket.on('sendMaze', (maze) => {
