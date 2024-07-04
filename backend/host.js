@@ -70,18 +70,13 @@ io.on('connection', (socket) => {
         // Notify all players in the game about the current waiting status
         games[gameId].players.forEach(player => player.emit('waiting', { playersCount: games[gameId].players.length }));
 
-        // if (games[gameId].players.length === 4) {
-            // socket.(gameId);
-        // }
+        if (games[gameId].players.length === 4) {
+            startGame(gameId);
+        }
     });
 
     socket.on('startGame', () => {
         // start = Date.now();
-        let generatedMaze = mazeGen.GenerateMaze(780, 600);
-
-        games[socket.gameId].players.concat(hosts).forEach(player => {
-            player.emit('sendMaze', generatedMaze);
-        });
 
         startGame(socket.gameId);
     });
@@ -107,6 +102,12 @@ io.on('connection', (socket) => {
     });
 
     const startGame = (gameId) => {
+        let generatedMaze = mazeGen.GenerateMaze(780, 600);
+
+        games[socket.gameId].players.concat(hosts).forEach(player => {
+            player.emit('sendMaze', generatedMaze);
+        });
+
         if (games[gameId].players.length >= 2) {
             games[gameId].status = 'in-progress';
             games[gameId].currentRound = 0;
