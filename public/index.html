@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Multiplayer Game</title>
     <link rel="stylesheet" href="css/player.css">
+    <link rel="stylesheet" href="css/winner.css">
     <script src="/socket.io/socket.io.js"></script>
     <script>
 
@@ -75,6 +76,8 @@
         return { newX, newY };
     }
 
+    let hasWon = false;
+
     function updateBallPosition() {
         const now = Date.now();
         const deltaTime = (now - lastUpdate) / 1000; // Time in seconds
@@ -97,8 +100,15 @@
         player.y = newY;
 
         if (Math.abs((player.x * cellSize) - end.x) <= endRadius && Math.abs((player.y * cellSize) - end.y) <= endRadius) {
-            socket.emit('declareWinner', player);
-            // resetPlayerPos();
+            
+            if (!hasWon) {
+                socket.emit('declareWinner', player);
+                document.getElementById('maze').style.display = 'none';
+                document.getElementById('ball').style.display = 'none';
+
+                document.getElementById('winner').style.display = 'flex';
+                hasWon = true;
+            }
         }
     }
             let prev;
@@ -165,11 +175,26 @@
                 socket.emit('endRound', {});
             });
 
-            socket.on('showWinner', (winner) => {
-                alert(`The winner is ${winner}`);
-            });
 
             let previous_positions = {};
+
+            socket.on("addWinner", (data) => {
+                const winners =  document.getElementById("winner");
+                let card = document.createElement("div");
+
+                card.classList.add("points-card");
+                card.classList.add(`card-${data.place}`);
+
+                card.innerHTML = `
+                <h3>${data.place}</h3>
+                <p class="points">${data.time}<span>POINTS</span></p>
+                <ul>
+                    <li>${data.name}</li>
+                    <li>Game ID: ${data.gameId}</li>
+                </ul>`;
+
+                winners.appendChild(card);
+            })
 
             socket.on("playerPositionChangedHost", (data) => {
                 let canvas = document.getElementById("ball");
@@ -313,6 +338,31 @@
                 console.error(data.message);
                 document.getElementById('errorMessage').innerText = data.message;
             });
+
+            const cards = document.querySelectorAll('.points-card');
+
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    if (card.classList.contains('stop-wiggle')) {
+                        startWiggle(card);
+                    } else {
+                        stopWiggle(card);
+                    }
+                });
+            });
+
+            function stopWiggle(card) {
+                card.classList.add('stop-wiggle');
+                card.style.animation = 'none';
+            }
+
+            function startWiggle(card) {
+                card.classList.remove('stop-wiggle');
+                // Trigger reflow to restart the animation
+                void card.offsetWidth;
+                card.style.animation = '';
+                card.classList.add('wiggle');
+            }
         });
 
     </script>
@@ -320,6 +370,9 @@
 <body>
     <canvas class="canvas" id="maze" style="display: none; border: 1px solid black" width="780" height="600"></canvas>
     <canvas class="canvas" id="ball" style="display: none; border: 1px solid black" width="780" height="600"></canvas>
+
+    <div id="winner" class="points-table" style="display: none">
+    </div>
 
     <div id="popup" class="container">
     <h1>Sink Hero</h1>

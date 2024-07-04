@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Host</title>
     <link rel="stylesheet" href="css/player.css">
+    <link rel="stylesheet" href="css/winner.css">
     <script src="/socket.io/socket.io.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -41,8 +42,29 @@
 
             let end = { x: canvas.width / 2, y: (rows * cellSize + cellSize) / 2 };
 
-            socket.on('showWinner', (winner) => {
-                alert(`The winner is ${winner}`);
+            socket.on('gameOver', (winner) => {
+                document.getElementById('maze').style.display = 'none';
+                document.getElementById('ball').style.display = 'none';
+
+                document.getElementById('winner').style.display = 'flex';
+            });
+
+            socket.on("addWinner", (data) => {
+                const winners =  document.getElementById("winner");
+                let card = document.createElement("div");
+
+                card.classList.add("points-card");
+                card.classList.add(`card-${data.place}`);
+
+                card.innerHTML = `
+                <h3>${data.place}</h3>
+                <p class="points">${data.time}<span>POINTS</span></p>
+                <ul>
+                    <li>${data.name}</li>
+                    <li>Game ID: ${data.gameId}</li>
+                </ul>`;
+
+                winners.appendChild(card);
             });
 
             socket.on('sendMaze', (maze) => {
@@ -110,6 +132,9 @@
 <body>
     <canvas class="canvas" id="maze" style="border: 1px solid black" width="780" height="600"></canvas>
     <canvas class="canvas" id="ball" width="780" height="600"></canvas>
+
+    <div id="winner" class="points-table" style="display: none">
+    </div>
 
     <div style="display: none;">
         <h1>Multiplayer Host</h1>
