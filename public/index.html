@@ -144,6 +144,9 @@
 
             // Animation loop
             function animate() {
+                if(hasWon)
+                    return;
+
                 updateBallPosition();
                 drawBall();
 
