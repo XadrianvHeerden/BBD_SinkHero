@@ -33,6 +33,7 @@ app.get('/host', (req, res) => {
     io.emit('hostAccessed');
 });
 
+let start = Date.now();
 io.on('connection', (socket) => {
     console.log('A player connected:', socket.id);
 
@@ -214,8 +215,23 @@ io.on('connection', (socket) => {
         if (!game)
             return;
 
+        if (!game.winners) {
+            game.winners = [];
+        }
+        let now = Date.now();
+
+        data.time = Math.round(5000 - ((now - start) / 100)); 
+
+        game.winners.push(data);
+
+        if (game.winners.length == game.players.length) {
+            hosts.forEach(host => host.emit('gameOver', {}))
+        }
+
+        data.place = game.winners.length;
+
         game.players.concat(hosts).forEach(player => {
-            player.emit('showWinner', data.name);
+            player.emit('addWinner', data);
         });
     })
 });
