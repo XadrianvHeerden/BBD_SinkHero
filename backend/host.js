@@ -75,6 +75,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('startGame', () => {
+        start = Date.now();
         let generatedMaze = mazeGen.GenerateMaze(780, 600);
 
         games[socket.gameId].players.concat(hosts).forEach(player => {
@@ -220,7 +221,7 @@ io.on('connection', (socket) => {
         }
         let now = Date.now();
 
-        data.time = Math.round(10000 - ((now - start) / 100)); 
+        data.time = Math.round(5000 - ((now - start) / 100)); 
 
         game.winners.push(data);
 
