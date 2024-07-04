@@ -220,7 +220,7 @@ io.on('connection', (socket) => {
         }
         let now = Date.now();
 
-        data.time = Math.round(5000 - ((now - start) / 100)); 
+        data.time = Math.round(10000 - ((now - start) / 100)); 
 
         game.winners.push(data);
 
