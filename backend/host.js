@@ -12,6 +12,8 @@ const io = socketIo(server);
 let hosts = [];
 let games = [];
 
+let start = Date.now();
+
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.get('/', (req, res) => {
@@ -33,7 +35,6 @@ app.get('/host', (req, res) => {
     io.emit('hostAccessed');
 });
 
-let start = Date.now();
 io.on('connection', (socket) => {
     console.log('A player connected:', socket.id);
 
@@ -219,9 +220,7 @@ io.on('connection', (socket) => {
         if (!game.winners) {
             game.winners = [];
         }
-        let now = Date.now();
-
-        data.time = Math.round(5000 - ((now - start) / 100)); 
+        // let now = Date.now();
 
         game.winners.push(data);
 
@@ -230,6 +229,7 @@ io.on('connection', (socket) => {
         }
 
         data.place = game.winners.length;
+        data.time = (5 - data.place) * 100 + Math.floor(Math.random() * 20);
 
         game.players.concat(hosts).forEach(player => {
             player.emit('addWinner', data);
