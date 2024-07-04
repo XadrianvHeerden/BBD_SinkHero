@@ -70,9 +70,9 @@ io.on('connection', (socket) => {
         // Notify all players in the game about the current waiting status
         games[gameId].players.forEach(player => player.emit('waiting', { playersCount: games[gameId].players.length }));
 
-        if (games[gameId].players.length === 4) {
-            startGame(gameId);
-        }
+        // if (games[gameId].players.length === 4) {
+            // socket.(gameId);
+        // }
     });
 
     socket.on('startGame', () => {
