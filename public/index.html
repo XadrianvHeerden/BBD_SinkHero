@@ -187,7 +187,7 @@
 
                 card.innerHTML = `
                 <h3>${data.place}</h3>
-                <p class="points">${data.time}<span>POINTS</span></p>
+                <p class="points">${data.time}<span> POINTS</span></p>
                 <ul>
                     <li>${data.name}</li>
                     <li>Game ID: ${data.gameId}</li>
@@ -337,6 +337,10 @@
             socket.on('error', (data) => {
                 console.error(data.message);
                 document.getElementById('errorMessage').innerText = data.message;
+            });
+
+            socket.on('reload', (data) => {
+                location.reload(true);
             });
 
             const cards = document.querySelectorAll('.points-card');

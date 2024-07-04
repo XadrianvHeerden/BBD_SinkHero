@@ -47,6 +47,7 @@
                 document.getElementById('ball').style.display = 'none';
 
                 document.getElementById('winner').style.display = 'flex';
+                document.getElementById('new').style.display = 'block';
             });
 
             socket.on("addWinner", (data) => {
@@ -58,7 +59,7 @@
 
                 card.innerHTML = `
                 <h3>${data.place}</h3>
-                <p class="points">${data.time}<span>POINTS</span></p>
+                <p class="points">${data.time}<span> POINTS</span></p>
                 <ul>
                     <li>${data.name}</li>
                     <li>Game ID: ${data.gameId}</li>
@@ -104,6 +105,10 @@
                 }
             });
 
+            socket.on('reload', (data) => {
+                location.reload(true);
+            });
+
             socket.on("playerPositionChangedHost", (data) => {
                 let canvas = document.getElementById("ball");
                 let ctx = canvas.getContext("2d");
@@ -126,6 +131,10 @@
 
                 previous_positions[data.playerId] = { x: data.x * 60, y: data.y * 60 };
             });
+
+            document.getElementById("new").addEventListener('click', (event) => {
+                socket.emit('restart', {});
+            });
         });
     </script>
 </head>
@@ -143,5 +152,6 @@
             <div id="gamesList"></div>
         </div>
     </div>
+    <button id="new" style="display: none">New Game</button>
 </body>
 </html>
