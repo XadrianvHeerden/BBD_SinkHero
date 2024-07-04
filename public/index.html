@@ -18,10 +18,11 @@
             const endRadius = cellSize / 3;
 
             let generatedMaze;
-            let end;
 
             const cols = Math.floor(canvas.width / cellSize);
             const rows = Math.floor(canvas.height / cellSize);
+
+            let end = { x: canvas.width / 2, y: (rows * cellSize + cellSize) / 2 };
 
             let player = null;
             let velocity = { x: 0, y: 0 };
@@ -95,18 +96,20 @@
         player.x = newX;
         player.y = newY;
 
-        // if (Math.abs(player.x - end.x) <= 0.2 && Math.abs(player.y - end.y) <= 0.2) {
-        //     alert("Congratulations! You've reached the end!");
-        //     // resetPlayerPos();
-        // }
+        if (Math.abs((player.x * cellSize) - end.x) <= endRadius && Math.abs((player.y * cellSize) - end.y) <= endRadius) {
+            socket.emit('declareWinner', player);
+            // resetPlayerPos();
+        }
     }
+            let prev;
 
             // Draw ball
             function drawBall() {
                 let canvas = document.getElementById("ball");
                 const ctx = canvas.getContext("2d");
 
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (prev)
+                    ctx.clearRect(prev.x - 11, prev.y - 11, 22, 22);
 
                 // const offsetX = (canvas.width - cols * cellSize) / 2;
                 // const offsetY = (canvas.height - rows * cellSize) / 2;
@@ -115,10 +118,18 @@
                 const ballPosY = player.y * cellSize;// + cellSize;// + offsetY;
 
                 ctx.beginPath();
+                ctx.arc(end.x, end.y, endRadius, 0, Math.PI * 2);
+                ctx.fillStyle = 'gold';
+                ctx.fill();
+                ctx.closePath();
+
+                ctx.beginPath();
                 ctx.arc(ballPosX, ballPosY, ballRadius, 0, Math.PI * 2);
                 ctx.fillStyle = player.colour;
                 ctx.fill();
                 ctx.closePath();
+
+                prev = {x: ballPosX, y: ballPosY};
             }
 
             // Animation loop
@@ -132,15 +143,9 @@
 
             // Handle gyroscope data
             window.addEventListener('deviceorientation', (event) => {
-                const now = Date.now();
-
-                if (now - lastUpdate > 16) { // Throttle to ~60fps
-                    // Map gyroscope data to acceleration
-                    acceleration.x = event.gamma / 100; // Adjust the sensitivity
-                    acceleration.y = event.beta / 100;  // Adjust the sensitivity
-
-                    lastUpdate = now;
-                }
+                // Map gyroscope data to acceleration
+                acceleration.x = event.gamma / 45; // Adjust the sensitivity
+                acceleration.y = event.beta / 90;  // Adjust the sensitivity
             });
 
             document.getElementById('joinButton').addEventListener('click', () => {
@@ -160,7 +165,32 @@
                 socket.emit('endRound', {});
             });
 
+            socket.on('showWinner', (winner) => {
+                alert(`The winner is ${winner}`);
+            });
+
+            let previous_positions = {};
+
+            socket.on("playerPositionChangedHost", (data) => {
+                let canvas = document.getElementById("ball");
+                let ctx = canvas.getContext("2d");
+
+                let previous_position = previous_positions[data.playerId];
+
+                if (previous_position)
+                    ctx.clearRect(previous_position.x - 11, previous_position.y - 11, 22, 22);
+
+                ctx.beginPath();
+                ctx.arc(data.x * 60, data.y * 60, 10, 0, 2 * Math.PI);
+                ctx.fillStyle = data.colour;
+                ctx.fill();
+
+                previous_positions[data.playerId] = { x: data.x * 60, y: data.y * 60 };
+            });
+
             socket.on('sendMaze', (maze) => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
                 for(let i = 0; i < maze.length; i++) {
                     for(let j = 0; j < maze[i].length; j++) {
                         maze[i][j].show = function() {

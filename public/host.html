@@ -32,7 +32,22 @@
             let canvas = document.getElementById("maze");
             let ctx = canvas.getContext("2d");
 
+            const cellSize = 60;
+            const ballRadius = cellSize / 6;
+            const endRadius = cellSize / 3;
+
+            const cols = Math.floor(canvas.width / cellSize);
+            const rows = Math.floor(canvas.height / cellSize);
+
+            let end = { x: canvas.width / 2, y: (rows * cellSize + cellSize) / 2 };
+
+            socket.on('showWinner', (winner) => {
+                alert(`The winner is ${winner}`);
+            });
+
             socket.on('sendMaze', (maze) => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
                 for(let i = 0; i < maze.length; i++) {
                     for(let j = 0; j < maze[i].length; j++) {
                         maze[i][j].show = function() {
@@ -76,6 +91,12 @@
                 if (previous_position)
                     ctx.clearRect(previous_position.x - 11, previous_position.y - 11, 22, 22);
 
+                ctx.beginPath();
+                ctx.arc(end.x, end.y, endRadius, 0, Math.PI * 2);
+                ctx.fillStyle = 'gold';
+                ctx.fill();
+
+                ctx.closePath();
                 ctx.beginPath();
                 ctx.arc(data.x * 60, data.y * 60, 10, 0, 2 * Math.PI);
                 ctx.fillStyle = data.colour;

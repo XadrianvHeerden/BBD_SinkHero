@@ -109,9 +109,10 @@ io.on('connection', (socket) => {
             games[gameId].currentRound = 0;
 
             let colours = ["#ff0000", "#ffff00", "#ff00ff", "#0000ff"];
+            let startPositions = [ {x: 30, y: 30}, {x:750, y:30}, {x:30, y:570}, {x:750, y:570}];
 
             games[gameId].players.forEach((player, index) => {
-                player.emit('gameStart', { gameId, playerId: index, name: player.name , x: 0, y: 0, colour: colours[index] });
+                player.emit('gameStart', { gameId, playerId: index, name: player.name , x: startPositions[index].x / 60, y: startPositions[index].y / 60, colour: colours[index] });
                 player.join(gameId); // Join a room with the gameId
             });
 
@@ -191,10 +192,32 @@ io.on('connection', (socket) => {
     });
 
     socket.on("playerPositionChanged", (data) => {
+        const game = games[data.gameId]; 
+
+        if (!game)
+            return;
+
+        game.players.forEach(player => {
+            if (player != socket) {
+                player.emit("playerPositionChangedHost", data);
+            }
+        });
+
         hosts.forEach(host => {
             host.emit("playerPositionChangedHost", data);
         })
     });
+
+    socket.on('declareWinner', (data) => {
+        let game = games[socket.gameId];
+
+        if (!game)
+            return;
+
+        game.players.concat(hosts).forEach(player => {
+            player.emit('showWinner', data.name);
+        });
+    })
 });
 
 server.listen(3000, () => {
